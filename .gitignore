@@ -1,0 +1,14 @@
+### Maven ###
+target/
+
+### IntelliJ IDEA ###
+out/
+!**/src/main/**/out/
+!**/src/test/**/out/
+
+### IDEs ###
+.vscode/
+.idea/
+
+### Mac OS ###
+.DS_Store
