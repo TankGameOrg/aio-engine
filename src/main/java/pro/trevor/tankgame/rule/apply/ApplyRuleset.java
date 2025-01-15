@@ -3,6 +3,7 @@ package pro.trevor.tankgame.rule.apply;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Stream;
 
 public class ApplyRuleset {
 
@@ -22,5 +23,9 @@ public class ApplyRuleset {
 
     public void add(ApplyRule rule) {
         rules.add(rule);
+    }
+
+    public Stream<ApplyRule> stream() {
+        return rules.stream();
     }
 }

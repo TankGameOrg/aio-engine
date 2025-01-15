@@ -17,6 +17,14 @@ public class Ruleset {
         this.invariantRuleset = new ApplyRuleset();
     }
 
+    public Ruleset(RulesetRegister register) {
+        this();
+        register.registerPlayerRules(playerActionRuleset);
+        register.registerTickRules(tickRuleset);
+        register.registerConditionalRules(conditionalRuleset);
+        register.registerInvariantRules(invariantRuleset);
+    }
+
     public ActionRuleset getPlayerActionRuleset() {
         return playerActionRuleset;
     }
@@ -31,14 +39,6 @@ public class Ruleset {
 
     public ApplyRuleset getInvariantRuleset() {
         return invariantRuleset;
-    }
-
-    public Ruleset register(RulesetRegister register) {
-        register.registerPlayerRules(playerActionRuleset);
-        register.registerTickRules(tickRuleset);
-        register.registerConditionalRules(conditionalRuleset);
-        register.registerInvariantRules(invariantRuleset);
-        return this;
     }
 
 }

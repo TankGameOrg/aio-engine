@@ -149,7 +149,16 @@ public class AttributeEntity implements Entity {
 
     @Override
     public Stream<Object> gather() {
-        return attributes.values().stream();
+        Stream<Object> result = Stream.empty();
+        for (Object value : attributes.values()) {
+            if (value instanceof IJsonObject) {
+                result = Stream.concat(result, Stream.of(value));
+            }
+            if (value instanceof Entity entity) {
+                result = Stream.concat(result, entity.gather());
+            }
+        }
+        return result;
     }
 
     private enum WrapperClass {

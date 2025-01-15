@@ -9,7 +9,7 @@ import pro.trevor.tankgame.util.MathUtil;
 import java.util.*;
 import java.util.stream.Stream;
 
-@JsonType(name = "AttributeList")
+@JsonType(name = "ListEntity")
 public class ListEntity<T> implements Collection<T>, Entity, IJsonObject {
 
     private final List<T> elements;
@@ -136,7 +136,9 @@ public class ListEntity<T> implements Collection<T>, Entity, IJsonObject {
     public Stream<Object> gather() {
         Stream<Object> result = Stream.empty();
         for (Object value : elements) {
-            result = Stream.concat(result, Stream.of(value));
+            if (value instanceof IJsonObject) {
+                result = Stream.concat(result, Stream.of(value));
+            }
             if (value instanceof Entity entity) {
                 result = Stream.concat(result, entity.gather());
             }

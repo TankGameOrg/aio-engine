@@ -49,20 +49,6 @@ public class State extends AttributeEntity implements IJsonObject {
         return playerRef.toPlayer(this);
     }
 
-    @Override
-    public Stream<Object> gather() {
-        Stream<Object> result = Stream.empty();
-        for (Object value : attributes.values()) {
-            if (value instanceof IJsonObject) {
-                result = Stream.concat(result, Stream.of(value));
-            }
-            if (value instanceof Entity entity) {
-                result = Stream.concat(result, Stream.of(entity.gather()));
-            }
-        }
-        return result;
-    }
-
     /**
      * Search the state for a tank controlled by the same player (ref)
      */

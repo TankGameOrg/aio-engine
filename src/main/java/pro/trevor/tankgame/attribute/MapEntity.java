@@ -14,7 +14,7 @@ import java.util.*;
  * @param <K> the key type.
  * @param <V> the value type.
  */
-@JsonType(name = "AttributeMap")
+@JsonType(name = "MapEntity")
 public class MapEntity<K, V> implements Map<K, V>, IJsonObject {
 
     private final Map<K, V> internalMap;

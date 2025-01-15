@@ -43,7 +43,7 @@ public class Codec {
     public static String typeFromClass(Class<?> c) {
         JsonType annotation = c.getAnnotation(JsonType.class);
         if (annotation == null) {
-            return c.getName();
+            return c.getSimpleName();
         } else {
             return annotation.name();
         }

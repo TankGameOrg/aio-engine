@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 public class Server {
 
-    @GetMapping("/")
+    @GetMapping("/games/list")
     public String index() {
         return "Hello World!";
     }
