@@ -6,7 +6,7 @@ import java.util.*;
 
 public class RulesetRegistry {
 
-    public final RulesetRegistry REGISTRY = new RulesetRegistry();
+    public static final RulesetRegistry REGISTRY = new RulesetRegistry();
 
     private final Map<String, RulesetRegister> RULESETS;
 
