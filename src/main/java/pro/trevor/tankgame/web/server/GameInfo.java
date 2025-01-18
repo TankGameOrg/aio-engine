@@ -32,4 +32,12 @@ public record GameInfo(String name, UUID uuid, Game game) implements IJsonObject
         result.put(STATE, game.getState().toJson());
         return result;
     }
+
+    public JSONObject toJsonWithoutState() {
+        JSONObject result = new JSONObject();
+        result.put(NAME, name);
+        result.put(UUID, uuid.toString());
+        result.put(RULESET, game.getRulesetIdentifier());
+        return result;
+    }
 }
