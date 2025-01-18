@@ -58,8 +58,9 @@ public class Main {
         LogEntry actionEntry = new LogEntry();
         actionEntry.put(Attribute.ACTION, "ExampleAction");
         actionEntry.put(Attribute.SUBJECT, new PlayerRef("TestPlayer"));
+        actionEntry.put(Attribute.GOLD, 1);
 
-        game.ingestAction(actionEntry);
+        System.out.println(game.ingestAction(actionEntry).toString(2));
 
         game.tick();
         System.out.println(game.getState().toString(2));
