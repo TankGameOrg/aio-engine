@@ -6,7 +6,7 @@ public interface Entity {
 
     Stream<Object> gather();
     default <T> Stream<T> gather(Class<T> type) {
-        return  gather().filter(type::isInstance).map(type::cast);
+        return gather().filter(type::isInstance).map(type::cast);
     }
 
 }

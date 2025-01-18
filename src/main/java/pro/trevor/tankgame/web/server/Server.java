@@ -19,6 +19,7 @@ import pro.trevor.tankgame.util.Position;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -93,6 +94,27 @@ public class Server {
         return output.toString();
     }
 
+    @GetMapping("/game/{uuid}/actions/{player}")
+    public String getUserPossibleActions(@PathVariable(name = "uuid") String uuidString, @PathVariable(name = "player") String player) {
+        if (!Util.isUUID(uuidString)) {
+            return error(new JSONObject().put("message", "Invalid game UUID"));
+        }
+
+        UUID uuid = UUID.fromString(uuidString);
+        GameInfo gameInfo = storage.getGameInfoByUUID(uuid);
+
+        if (gameInfo == null) {
+            return error(new JSONObject().put("message", "Invalid game UUID"));
+        }
+
+        Optional<Player> maybePlayer = gameInfo.game().getState().getPlayer(new PlayerRef(player));
+        if (maybePlayer.isEmpty()) {
+            return error(new JSONObject().put("message", "Invalid player"));
+        }
+
+        return gameInfo.game().possibleActions(new PlayerRef(player)).toString();
+    }
+
     @GetMapping("/game/{uuid}/{id}")
     public String getGamePreviousState(@PathVariable(name = "uuid") String uuidString, @PathVariable(name = "id") int id) {
         if (!Util.isUUID(uuidString)) {
@@ -117,7 +139,7 @@ public class Server {
 
     @GetMapping("/test")
     public String test() {
-        Game game = new Game(new DefaultRulesetRegister(), new State(new Board(1, 1), new Council(), new ListEntity<>(List.of(new Player("TestPlayer")))));
+        Game game = new Game(new DefaultRulesetRegister(), new State(new Board(3, 3), new Council(), new ListEntity<>(List.of(new Player("TestPlayer")))));
         game.getState().getBoard().putUnit(new Tank(new PlayerRef("TestPlayer"), new Position(0, 0), Map.of()));
         GameInfo gameInfo = new GameInfo("Test Game " + ((int) (Math.random() * 100)), UUID.randomUUID(), game);
 
@@ -128,7 +150,7 @@ public class Server {
         actionEntry.put(Attribute.SUBJECT, new PlayerRef("TestPlayer"));
         actionEntry.put(Attribute.GOLD, 1);
 
-        System.out.println(game.ingestAction(actionEntry).toString(2));
+        game.ingestAction(actionEntry).toString(2);
 
         game.tick();
 
