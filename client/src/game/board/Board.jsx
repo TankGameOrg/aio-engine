@@ -1,20 +1,5 @@
-
-function toBoardSpace(element) {
-
-    const type = element.class;
-
-    if (type === undefined) {
-        return "Empty";
-    }
-
-    if (type === "Tank") {
-        return element?.$PLAYER_REF?.name ?? "UnknownTankName"
-    } else if (type === "Wall") {
-        return element?.$DURABILITY ?? "UnknownDurabilityWall"
-    }
-
-    return "Empty"
-}
+import BoardCell from "./BoardCell.jsx";
+import BoardOuterCell from "./BoardOuterCell.jsx";
 
 function Board({board}) {
     const { units, floors, width, height } = board;
@@ -44,10 +29,14 @@ function Board({board}) {
     }
 
     return (
-        <div>
+        <div className="board-wrapper">
+            <div className="board-row">
+                { Array(width + 1).fill(0).map((_, index) => <BoardOuterCell number={index} isLetter={true} key={index} />) }
+            </div>
             { unitBoard.map((row, rowIndex) =>
-                <div key={rowIndex}>
-                    { row.map((element, columnIndex) => <span key={`${rowIndex}:${columnIndex}`}> { toBoardSpace(element) } </span>) }
+                <div className="board-row" key={rowIndex}>
+                    <BoardOuterCell number={rowIndex + 1} isLetter={false} />
+                    { row.map((element, columnIndex) => <BoardCell key={`${rowIndex}:${columnIndex}`} unit={element} floor={floorBoard[rowIndex][columnIndex]} onClick={() => {}} />) }
                 </div>
             )}
         </div>

@@ -1,8 +1,8 @@
 import {useParams} from "react-router-dom";
-import {fetchGame, fetchGames} from "./util/fetch.js";
-import {SERVER_URL} from "./util/constants.js";
+import {fetchGame} from "../util/fetch.js";
+import {SERVER_URL} from "../util/constants.js";
 import {useEffect, useState} from "react";
-import Board from "./Board.jsx";
+import Board from "./board/Board.jsx";
 
 function Game() {
     const uuid = useParams().uuid;

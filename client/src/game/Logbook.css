@@ -1,0 +1,13 @@
+.logbook-wrapper {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+.logbook {
+    margin: 0;
+    padding: 0;
+    border: solid 2px #bbb;
+    height: 100%;
+    overflow-y: auto;
+}
