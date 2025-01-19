@@ -8,7 +8,6 @@ import pro.trevor.tankgame.rule.RulesetRegister;
 import pro.trevor.tankgame.rule.action.*;
 import pro.trevor.tankgame.rule.action.Error;
 import pro.trevor.tankgame.rule.action.parameter.Parameter;
-import pro.trevor.tankgame.rule.action.parameter.ParameterBound;
 import pro.trevor.tankgame.state.State;
 import pro.trevor.tankgame.state.meta.Player;
 import pro.trevor.tankgame.state.meta.PlayerRef;
@@ -46,7 +45,17 @@ public class Game {
         return rulesetIdentifier;
     }
 
-    public JSONObject ingestAction(LogEntry actionEntry) {
+    public JSONObject ingestEntry(LogEntry entry) {
+        if (entry.getOrElse(Attribute.DO_TICK, false)) {
+            tick();
+            return jsonSuccess();
+        } else if (entry.has(Attribute.ACTION) && entry.has(Attribute.SUBJECT)) {
+            return ingestPlayerAction(entry);
+        }
+        return jsonError("Failed to ingest entry of unknown format");
+    }
+
+    private JSONObject ingestPlayerAction(LogEntry actionEntry) {
         PlayerRef subjectRef = actionEntry.getUnsafe(Attribute.SUBJECT);
         String actionName = actionEntry.getUnsafe(Attribute.ACTION);
         Optional<Player> maybePlayer = state.getPlayer(subjectRef);

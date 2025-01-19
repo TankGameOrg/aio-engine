@@ -60,7 +60,7 @@ public class Main {
         actionEntry.put(Attribute.SUBJECT, new PlayerRef("TestPlayer"));
         actionEntry.put(Attribute.GOLD, 1);
 
-        System.out.println(game.ingestAction(actionEntry).toString(2));
+        System.out.println(game.ingestEntry(actionEntry).toString(2));
 
         game.tick();
         System.out.println(game.getState().toString(2));

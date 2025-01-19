@@ -86,7 +86,25 @@ public class Server {
         GameInfo gameInfo = storage.getGameInfoByUUID(uuid);
 
         LogEntry logEntry = new LogEntry(new JSONObject(requestBody));
-        JSONObject output = gameInfo.game().ingestAction(new LogEntry(new JSONObject(requestBody)));
+        JSONObject output = gameInfo.game().ingestEntry(logEntry);
+        if (!output.getBoolean("error")) {
+            storage.saveGameAfterAction(gameInfo, logEntry);
+        }
+
+        return output.toString();
+    }
+
+    @PostMapping("/game/{uuid}/tick")
+    public String postGameTick(@PathVariable(name = "uuid") String uuidString) {
+        if (!Util.isUUID(uuidString)) {
+            return error(new JSONObject().put("message", "Invalid game UUID"));
+        }
+
+        UUID uuid = UUID.fromString(uuidString);
+        GameInfo gameInfo = storage.getGameInfoByUUID(uuid);
+
+        LogEntry logEntry = new LogEntry(Map.of(Attribute.DO_TICK, true));
+        JSONObject output = gameInfo.game().ingestEntry(logEntry);
         if (!output.getBoolean("error")) {
             storage.saveGameAfterAction(gameInfo, logEntry);
         }
@@ -115,7 +133,7 @@ public class Server {
         return gameInfo.game().possibleActions(new PlayerRef(player)).toString();
     }
 
-    @GetMapping("/game/{uuid}/{id}")
+    @GetMapping("/game/{uuid}/state/{id}")
     public String getGamePreviousState(@PathVariable(name = "uuid") String uuidString, @PathVariable(name = "id") int id) {
         if (!Util.isUUID(uuidString)) {
             return error(new JSONObject().put("message", "Invalid game UUID"));
@@ -141,7 +159,7 @@ public class Server {
     public String test() {
         Game game = new Game(new DefaultRulesetRegister(), new State(new Board(3, 3), new Council(), new ListEntity<>(List.of(new Player("TestPlayer")))));
         game.getState().getBoard().putUnit(new Tank(new PlayerRef("TestPlayer"), new Position(0, 0), Map.of()));
-        GameInfo gameInfo = new GameInfo("Test Game " + ((int) (Math.random() * 100)), UUID.randomUUID(), game);
+        GameInfo gameInfo = new GameInfo("Test Game " + ((int) (Math.random() * 1000)), UUID.randomUUID(), game);
 
         storage.saveInitialState(gameInfo);
 
@@ -150,7 +168,7 @@ public class Server {
         actionEntry.put(Attribute.SUBJECT, new PlayerRef("TestPlayer"));
         actionEntry.put(Attribute.GOLD, 1);
 
-        game.ingestAction(actionEntry).toString(2);
+        game.ingestEntry(actionEntry).toString(2);
 
         game.tick();
 

@@ -22,13 +22,9 @@ public class Attribute<E> {
     public static final Attribute<PlayerRef> PLAYER_REF = new Attribute<>("PLAYER_REF", PlayerRef.class);
     public static final Attribute<Integer> GOLD = new Attribute<>("GOLD", Integer.class);
     public static final Attribute<Integer> ACTION_POINTS = new Attribute<>("ACTIONS", Integer.class);
-    public static final Attribute<Integer> MAX_ACTION_POINTS = new Attribute<>("MAX_ACTIONS", Integer.class);
     public static final Attribute<Integer> RANGE = new Attribute<>("RANGE", Integer.class);
     public static final Attribute<Integer> SPEED = new Attribute<>("SPEED", Integer.class);
-    public static final Attribute<Integer> PREVIOUS_SPEED = new Attribute<>("PREVIOUS_SPEED", Integer.class);
     public static final Attribute<Integer> BOUNTY = new Attribute<>("BOUNTY", Integer.class);
-    public static final Attribute<Boolean> SLOWED = new Attribute<>("SLOWED", Boolean.class);
-    public static final Attribute<Boolean> HASTENED = new Attribute<>("HASTENED", Boolean.class);
 
     // Durability attributes
     public static final Attribute<Integer> DURABILITY = new Attribute<>("DURABILITY", Integer.class);
@@ -53,24 +49,18 @@ public class Attribute<E> {
     public static final Attribute<ListEntity> SENATORS = new Attribute<>("SENATORS", ListEntity.class); // AttributeList<Player>
     public static final Attribute<Integer> COFFER = new Attribute<>("COFFER", Integer.class);
     public static final Attribute<Boolean> CAN_BOUNTY = new Attribute<>("CAN_BOUNTY", Boolean.class);
-    public static final Attribute<Integer> ARMISTICE = new Attribute<>("ARMISTICE", Integer.class);
-    public static final Attribute<Integer> MAX_ARMISTICE = new Attribute<>("MAX_ARMISTICE", Integer.class);
 
     // Player attributes
     public static final Attribute<String> NAME = new Attribute<>("NAME", String.class);
     public static final Attribute<String> TEAM = new Attribute<>("TEAM", String.class);
     public static final Attribute<Integer> POWER = new Attribute<>("POWER", Integer.class);
-    public static final Attribute<Long> GLOBAL_COOLDOWN_END_TIME = new Attribute<>("GLOBAL_COOLDOWN_END_TIME", Long.class);
 
     // Log entry attributes
+    public static final Attribute<Boolean> DO_TICK = new Attribute<>("DO_TICK", Boolean.class);
+    public static final Attribute<String> ACTION = new Attribute<>("ACTION", String.class);
+    public static final Attribute<PlayerRef> SUBJECT = new Attribute<>("SUBJECT", PlayerRef.class);
     public static final Attribute<Position> TARGET_POSITION = new Attribute<>("TARGET_POSITION", Position.class);
     public static final Attribute<PlayerRef> TARGET_PLAYER = new Attribute<>("TARGET_PLAYER", PlayerRef.class);
-    public static final Attribute<Integer> DONATION = new Attribute<>("DONATION", Integer.class);
-    public static final Attribute<Boolean> HIT = new Attribute<>("HIT", Boolean.class);
-    public static final Attribute<Long> TIMESTAMP = new Attribute<>("TIMESTAMP", Long.class);
-    public static final Attribute<Integer> DAY = new Attribute<>("DAY", Integer.class);
-    public static final Attribute<PlayerRef> SUBJECT = new Attribute<>("SUBJECT", PlayerRef.class);
-    public static final Attribute<String> ACTION = new Attribute<>("ACTION", String.class);
 
     // Random number generation attributes
     public static final Attribute<Long> RNG_SEED = new Attribute<>("RNG_SEED", Long.class);
