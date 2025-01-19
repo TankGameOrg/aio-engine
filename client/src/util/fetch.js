@@ -12,7 +12,7 @@ function fetchState(url, uuid, index) {
     return fetch(`${url}/game/${uuid}/${index}`, {});
 }
 
-function postAction(url, entry) {
+function postAction(url, uuid, entry) {
     return fetch(`${url}/game/${uuid}/action`,
         {
             method: 'POST',
@@ -20,7 +20,15 @@ function postAction(url, entry) {
         });
 }
 
-function postTick(url) {
+function postUndoAction(url, uuid) {
+    return fetch(`${url}/game/${uuid}/undo`,
+        {
+            method: 'POST',
+        }
+    );
+}
+
+function postTick(url, uuid) {
     return fetch(`${url}/game/${uuid}/tick`,
         {
             method: 'POST',
@@ -28,4 +36,4 @@ function postTick(url) {
     );
 }
 
-export { fetchGames, fetchGame, fetchState, postAction, postTick };
+export { fetchGames, fetchGame, fetchState, postAction, postUndoAction, postTick };

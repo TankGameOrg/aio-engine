@@ -2,6 +2,8 @@ package pro.trevor.tankgame.web.server;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import pro.trevor.tankgame.rule.action.LogEntry;
 import pro.trevor.tankgame.state.State;
 
@@ -14,6 +16,7 @@ public class Storage {
     private static final String STATE_FILE_NAME = "game" + JSON_FILE_SUFFIX;
     private static final String LOGBOOK_FILE_NAME = "log" + JSON_FILE_SUFFIX;
     private static final String STATE_HISTORY_DIRECTORY_NAME = "history";
+    private static final Logger log = LoggerFactory.getLogger(Storage.class);
 
     private final File base;
     private final Map<UUID, GameInfo> games;
@@ -36,7 +39,6 @@ public class Storage {
     private void initializeGameDirectory(UUID uuid) {
         File gameDirectory = gameDirectory(uuid);
         File historyDirectory = stateHistoryDirectory(uuid);
-        File logbookFile = logbookFile(uuid);
 
         gameDirectory.mkdirs();
         assert gameDirectory.exists();
@@ -243,6 +245,54 @@ public class Storage {
 
     public List<LogEntry> getLogbookByUUID(UUID uuid) {
         return logbooks.get(uuid);
+    }
+
+    public boolean undoAction(UUID uuid) {
+        GameInfo gameInfo = games.get(uuid);
+        List<LogEntry> logbook = logbooks.get(uuid);
+
+        // Fail if the game information or logbook cannot be found by the given ID
+        if (gameInfo == null || logbook == null) {
+            Log.LOGGER.error("Attempted to remove most recent action from game '{}' with UUID {}", gameInfo == null ? "null" : gameInfo.name(), uuid);
+            return false;
+        }
+
+        Log.LOGGER.info("Attempting to remove most recent action from game '{}' with UUID {}", gameInfo.name(), uuid);
+
+        // Succeed if the logbook is already empty
+        if (logbook.isEmpty()) {
+            Log.LOGGER.error("The logbook is already empty");
+            return true;
+        }
+
+        File stateToDelete = new File(stateHistoryDirectory(uuid), logbook.size() + JSON_FILE_SUFFIX);
+
+        // Fail if deleting the latest state is not successful
+        if (!stateToDelete.delete()) {
+            Log.LOGGER.error("Failed to delete state file {}", stateToDelete.getAbsolutePath());
+            return false;
+        }
+
+        LogEntry removed = logbook.removeLast();
+        State newCurrentState = readStateFromHistory(uuid, logbook.size());
+
+        // Fail if we could not read the previous state
+        if (newCurrentState == null) {
+            Log.LOGGER.error("Failed to read the previous state");
+            // Add back the removed entry before returning
+            logbook.add(removed);
+            return false;
+        }
+
+        gameInfo.game().setState(newCurrentState);
+        games.put(uuid, gameInfo);
+        logbooks.put(uuid, logbook);
+
+        saveLogbook(gameInfo);
+        saveGameInfo(gameInfo);
+
+        Log.LOGGER.info("Successfully removed most recent action from game '{}' with UUID {}", gameInfo.name(), gameInfo.uuid());
+        return true;
     }
 
 }

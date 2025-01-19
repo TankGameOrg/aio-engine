@@ -46,7 +46,7 @@ public class Game {
     }
 
     public JSONObject ingestEntry(LogEntry entry) {
-        if (entry.getOrElse(Attribute.DO_TICK, false)) {
+        if (entry.get(Attribute.TICK).isPresent()) {
             tick();
             return jsonSuccess();
         } else if (entry.has(Attribute.ACTION) && entry.has(Attribute.SUBJECT)) {
@@ -99,6 +99,7 @@ public class Game {
             tickRule.apply(state);
             enforceInvariants();
         });
+        state.put(Attribute.TICK, state.getOrElse(Attribute.TICK, 0) + 1);
     }
 
     public void checkConditions() {

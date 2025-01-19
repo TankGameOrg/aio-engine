@@ -85,6 +85,10 @@ public class Server {
         UUID uuid = UUID.fromString(uuidString);
         GameInfo gameInfo = storage.getGameInfoByUUID(uuid);
 
+        if (gameInfo == null) {
+            return error(new JSONObject().put("message", "Invalid game UUID"));
+        }
+
         LogEntry logEntry = new LogEntry(new JSONObject(requestBody));
         JSONObject output = gameInfo.game().ingestEntry(logEntry);
         if (!output.getBoolean("error")) {
@@ -92,6 +96,26 @@ public class Server {
         }
 
         return output.toString();
+    }
+
+    @PostMapping("/game/{uuid}/undo")
+    public String postRedactGameAction(@PathVariable(name = "uuid") String uuidString) {
+        if (!Util.isUUID(uuidString)) {
+            return error(new JSONObject().put("message", "Invalid game UUID"));
+        }
+
+        UUID uuid = UUID.fromString(uuidString);
+        GameInfo gameInfo = storage.getGameInfoByUUID(uuid);
+
+        if (gameInfo == null) {
+            return error(new JSONObject().put("message", "Invalid game UUID"));
+        }
+
+        if (!storage.undoAction(uuid)) {
+            error(new JSONObject().put("message", "Failed to undo most recent action"));
+        }
+
+        return success(new JSONObject());
     }
 
     @PostMapping("/game/{uuid}/tick")
@@ -103,7 +127,11 @@ public class Server {
         UUID uuid = UUID.fromString(uuidString);
         GameInfo gameInfo = storage.getGameInfoByUUID(uuid);
 
-        LogEntry logEntry = new LogEntry(Map.of(Attribute.DO_TICK, true));
+        if (gameInfo == null) {
+            return error(new JSONObject().put("message", "Invalid game UUID"));
+        }
+
+        LogEntry logEntry = new LogEntry(Map.of(Attribute.TICK, gameInfo.game().getState().getOrElse(Attribute.TICK, 0) + 1));
         JSONObject output = gameInfo.game().ingestEntry(logEntry);
         if (!output.getBoolean("error")) {
             storage.saveGameAfterAction(gameInfo, logEntry);
