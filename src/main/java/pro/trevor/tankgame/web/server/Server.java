@@ -64,7 +64,7 @@ public class Server {
             return error(new JSONObject().put("message", "Invalid game UUID"));
         }
 
-        JSONObject gameInfoJson = gameInfo.toJson();
+        JSONObject gameInfoJson = gameInfo.toJsonWithoutState();
 
         JSONArray logbookJson = new JSONArray();
         for (LogEntry logEntry : logbook) {
