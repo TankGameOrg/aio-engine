@@ -11,3 +11,29 @@
     height: 100%;
     overflow-y: auto;
 }
+
+.logbook-list {
+    list-style: none;
+    text-align: left;
+    margin: 0;
+    padding: 4px;
+    background: #303434;
+}
+
+.logbook-entry {
+    color: inherit;
+    text-decoration: none;
+    display: block;
+}
+
+.logbook-entry:hover {
+    color: #1a1a1a;
+    background: #a1a1a1;
+    cursor: pointer;
+}
+
+.logbook-entry-current {
+    color: inherit;
+    text-decoration: underline;
+    display: block;
+}

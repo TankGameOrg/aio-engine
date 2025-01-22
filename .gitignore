@@ -1,5 +1,8 @@
 games/
 
+client/node_modules/
+client/package-lock.json
+
 ### Maven ###
 target/
 
@@ -14,4 +17,3 @@ out/
 
 ### Mac OS ###
 .DS_Store
-/client/node_modules/

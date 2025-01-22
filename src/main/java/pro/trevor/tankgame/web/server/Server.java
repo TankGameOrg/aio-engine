@@ -161,6 +161,24 @@ public class Server {
         return gameInfo.game().possibleActions(new PlayerRef(player)).toString();
     }
 
+    @GetMapping("/game/{uuid}/state/current")
+    public String getGameCurrentStateNumber(@PathVariable(name = "uuid") String uuidString) {
+        if (!Util.isUUID(uuidString)) {
+            return error(new JSONObject().put("message", "Invalid game UUID"));
+        }
+
+        UUID uuid = UUID.fromString(uuidString);
+        GameInfo gameInfo = storage.getGameInfoByUUID(uuid);
+
+        if (gameInfo == null) {
+            return error(new JSONObject().put("message", "Invalid game UUID"));
+        }
+
+        int states = storage.getGameStateHistorySize(uuid);
+
+        return String.valueOf(states);
+    }
+
     @GetMapping("/game/{uuid}/state/{id}")
     public String getGamePreviousState(@PathVariable(name = "uuid") String uuidString, @PathVariable(name = "id") int id) {
         if (!Util.isUUID(uuidString)) {

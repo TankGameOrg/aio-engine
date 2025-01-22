@@ -1,5 +1,3 @@
-import * as url from "node:url";
-
 function fetchGames(url) {
     return fetch(`${url}/games/list`, {});
 }
@@ -9,7 +7,11 @@ function fetchGame(url, uuid) {
 }
 
 function fetchState(url, uuid, index) {
-    return fetch(`${url}/game/${uuid}/${index}`, {});
+    return fetch(`${url}/game/${uuid}/state/${index}`, {});
+}
+
+function fetchCurrentGameNumber(url, uuid) {
+    return fetch(`${url}/game/${uuid}/state/current`, {});
 }
 
 function postAction(url, uuid, entry) {
@@ -36,4 +38,4 @@ function postTick(url, uuid) {
     );
 }
 
-export { fetchGames, fetchGame, fetchState, postAction, postUndoAction, postTick };
+export { fetchGames, fetchGame, fetchState, fetchCurrentGameNumber, postAction, postUndoAction, postTick };

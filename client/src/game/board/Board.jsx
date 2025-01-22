@@ -8,8 +8,6 @@ function Board({board}) {
         return (<span>Loading...</span>);
     }
 
-    console.log(units);
-
     const unitBoard = Array.from({length: height},
         () => Array.from({length: width}, () => ({}))
     );

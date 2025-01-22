@@ -2,8 +2,6 @@ package pro.trevor.tankgame.web.server;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import pro.trevor.tankgame.rule.action.LogEntry;
 import pro.trevor.tankgame.state.State;
 
@@ -16,7 +14,6 @@ public class Storage {
     private static final String STATE_FILE_NAME = "game" + JSON_FILE_SUFFIX;
     private static final String LOGBOOK_FILE_NAME = "log" + JSON_FILE_SUFFIX;
     private static final String STATE_HISTORY_DIRECTORY_NAME = "history";
-    private static final Logger log = LoggerFactory.getLogger(Storage.class);
 
     private final File base;
     private final Map<UUID, GameInfo> games;
