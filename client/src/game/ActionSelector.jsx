@@ -62,23 +62,24 @@ function ActionSelector({players, uuid, enabled, update}) {
                     setChosenActionParameters(newChosenActionParameters);
                 }} key={parameter.name} />) }
             </div>
-            <button disabled={ selectedAction.name === DEFAULT_STRING || Object.keys(chosenActionParameters).length !== selectedAction.parameters.length} onClick={
-                () => {
-                    const entry = {};
-                    Object.values(chosenActionParameters).map((parameter) => entry[parameter.attribute] = parameter.selected);
-                    entry.action = selectedAction.name;
-                    entry.subject = {
-                        name: player,
-                        class: "PlayerRef",
-                    };
-                    console.log(entry);
-                    postAction(SERVER_URL, uuid, entry).then(() => update());
-                    setPlayer(DEFAULT_STRING);
-                    setPossibleActions(DEFAULT_POSSIBLE_ACTIONS);
-                    setSelectedAction(DEFAULT_SELECTED_ACTION);
-                    setChosenActionParameters(DEFAULT_CHOSEN_ACTION_PARAMETERS);
-                }
-            }>Submit!</button>
+            { selectedAction.name === DEFAULT_STRING ? <></> :
+                <button disabled={ Object.keys(chosenActionParameters).length !== selectedAction.parameters.length} onClick={
+                    () => {
+                        const entry = {};
+                        Object.values(chosenActionParameters).map((parameter) => entry[parameter.attribute] = parameter.selected);
+                        entry.action = selectedAction.name;
+                        entry.subject = {
+                            name: player,
+                            class: "PlayerRef",
+                        };
+                        postAction(SERVER_URL, uuid, entry).then(() => update());
+                        setPlayer(DEFAULT_STRING);
+                        setPossibleActions(DEFAULT_POSSIBLE_ACTIONS);
+                        setSelectedAction(DEFAULT_SELECTED_ACTION);
+                        setChosenActionParameters(DEFAULT_CHOSEN_ACTION_PARAMETERS);
+                    }
+                }>Submit!</button>
+            }
         </div>
     );
 }
