@@ -5,18 +5,24 @@ import {useCallback, useEffect, useRef, useState} from "react";
 import Board from "./board/Board.jsx";
 import promptMatches from "../util/prompt.js";
 import Logbook from "./Logbook.jsx";
+import "./Game.css";
+import ActionSelector from "./ActionSelector.jsx";
 
 function Game() {
     const uuid = useParams().uuid;
 
     const [activeGame, setActiveGame] = useState(0);
     const [state, setState] = useState(
-        { $BOARD: {
-            units: [],
-            floors: [],
-            width: 0,
-            height: 0,
-        }}
+        {
+            $BOARD: {
+                units: [],
+                floors: [],
+                width: 0,
+                height: 0,
+            }, $PLAYERS: {
+                elements: [],
+            }
+        }
     );
     const mostRecentGame = useRef(0);
     const game = useRef({
@@ -69,17 +75,18 @@ function Game() {
         }
     }, [updateLogbook]);
 
-    console.log(game.current);
-
     return (
         <div>
             <h1>
                 {game.current.name}
             </h1>
-            <Logbook logbook={game.current?.logbook} activeGame={activeGame} setActiveGame={setActiveGame} />
-            <Board board={state.$BOARD}/>
+            <div className="logbook-board-container">
+                <Logbook logbook={game.current?.logbook} activeGame={activeGame} setActiveGame={setActiveGame} />
+                <Board board={state.$BOARD}/>
+            </div>
             <button onClick={() => advanceTick()}>Next Day</button>
             <button onClick={() => undoAction()}>Undo Previous Action</button>
+            <ActionSelector enabled={true} uuid={uuid} players={state.$PLAYERS.elements} update={updateLogbook} />
         </div>
     );
 }

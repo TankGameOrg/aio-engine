@@ -14,6 +14,10 @@ function fetchCurrentGameNumber(url, uuid) {
     return fetch(`${url}/game/${uuid}/state/current`, {});
 }
 
+function fetchPossibleActions(url, uuid, playerName) {
+    return fetch(`${url}/game/${uuid}/actions/${encodeURIComponent(playerName)}`, {});
+}
+
 function postAction(url, uuid, entry) {
     return fetch(`${url}/game/${uuid}/action`,
         {
@@ -38,4 +42,4 @@ function postTick(url, uuid) {
     );
 }
 
-export { fetchGames, fetchGame, fetchState, fetchCurrentGameNumber, postAction, postUndoAction, postTick };
+export { fetchGames, fetchGame, fetchState, fetchCurrentGameNumber, fetchPossibleActions, postAction, postUndoAction, postTick };

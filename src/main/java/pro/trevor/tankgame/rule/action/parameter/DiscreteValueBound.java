@@ -1,9 +1,6 @@
 package pro.trevor.tankgame.rule.action.parameter;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
 import pro.trevor.tankgame.attribute.Attribute;
-import pro.trevor.tankgame.attribute.Codec;
 
 import java.util.ArrayList;
 import java.util.Arrays;

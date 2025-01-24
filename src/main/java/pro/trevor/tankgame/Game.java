@@ -142,7 +142,7 @@ public class Game {
 
             JSONArray parametersArray = new JSONArray();
             for (Parameter<?> parameter : rule.getParameters()) {
-                parametersArray.put(parameter.possibleParameters(state, player).toJson());
+                parametersArray.put(parameter.possibleParameters(state, player).toJson().put("name", parameter.getName()));
             }
             possibleAction.put("parameters", parametersArray);
 

@@ -26,7 +26,7 @@ public class DefaultRulesetRegister implements RulesetRegister {
     public void registerPlayerRules(ActionRuleset actionRuleset) {
         actionRuleset.add(
                 new Description("ExampleAction", "An example rule that applies only if the player has a tank on the board"),
-                new ActionRule(new Predicate(), new ExampleAction(), new Parameter<>(Attribute.GOLD, (state, player) -> new DiscreteValueBound<>(Attribute.GOLD, 0, 1 ,2))));
+                new ActionRule(new Predicate(), new ExampleAction(), new Parameter<>("Gold", Attribute.GOLD, (state, player) -> new DiscreteValueBound<>(Attribute.GOLD, 0, 1 ,2))));
     }
 
     @Override

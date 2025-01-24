@@ -5,16 +5,20 @@ import pro.trevor.tankgame.rule.action.LogEntry;
 import pro.trevor.tankgame.state.State;
 import pro.trevor.tankgame.state.meta.Player;
 
-import java.util.List;
-
 public class Parameter<T> {
 
+    private final String name;
     private final Attribute<T> attribute;
     private final AvailableParameterSupplier<T> supplier;
 
-    public Parameter(Attribute<T> attribute, AvailableParameterSupplier<T> supplier) {
+    public Parameter(String name, Attribute<T> attribute, AvailableParameterSupplier<T> supplier) {
+        this.name = name;
         this.attribute = attribute;
         this.supplier = supplier;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public Attribute<T> getAttribute() {

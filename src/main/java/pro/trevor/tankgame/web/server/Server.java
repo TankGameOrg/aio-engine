@@ -17,6 +17,8 @@ import pro.trevor.tankgame.state.meta.PlayerRef;
 import pro.trevor.tankgame.util.Position;
 
 import java.io.File;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -152,6 +154,8 @@ public class Server {
         if (gameInfo == null) {
             return error(new JSONObject().put("message", "Invalid game UUID"));
         }
+
+        player = URLDecoder.decode(player, StandardCharsets.UTF_8);
 
         Optional<Player> maybePlayer = gameInfo.game().getState().getPlayer(new PlayerRef(player));
         if (maybePlayer.isEmpty()) {
