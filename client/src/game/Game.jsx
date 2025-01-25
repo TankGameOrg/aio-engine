@@ -1,7 +1,7 @@
 import {useParams} from "react-router-dom";
 import {fetchGame, fetchState, postTick, postUndoAction} from "../util/fetch.js";
 import {SERVER_URL} from "../util/constants.js";
-import {useCallback, useEffect, useRef, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import Board from "./board/Board.jsx";
 import promptMatches from "../util/prompt.js";
 import Logbook from "./Logbook.jsx";
@@ -24,28 +24,25 @@ function Game() {
             }
         }
     );
-    const mostRecentGame = useRef(0);
-    const game = useRef({
+    const [game, setGame] = useState({
         name: "Loading...",
         logbook: []
     });
 
     const updateLogbook = useCallback(() => {
+        console.log("update logbook");
         return fetchGame(SERVER_URL, uuid).then(res => res.json()).then(data => {
-            game.current.logbook = data.logbook;
-            game.current.name = data.name;
-            const number = data.logbook.length;
-            const doSwitch = (mostRecentGame.current === activeGame);
-            mostRecentGame.current = number;
-            if (doSwitch) {
-                setActiveGame(number);
+            const previousLogbookLength = game.logbook.length;
+            setGame({...game, logbook: data.logbook, name: data.name});
+            if (activeGame === previousLogbookLength) {
+                setActiveGame(data.logbook.length);
             }
         });
-    }, [activeGame]);
+    }, [activeGame, game]);
 
     function updateLogbookFromServerForever() {
         updateLogbook().then(() => {
-            setTimeout(updateLogbookFromServerForever, 5000);
+            setTimeout(updateLogbookFromServerForever, 2500);
         });
     }
 
@@ -61,32 +58,32 @@ function Game() {
 
     const advanceTick = useCallback(() => {
         if (promptMatches("Enter the magic word", "Abracadabra", "dawn")) {
-            postTick(SERVER_URL, uuid).then(updateLogbook).then(() => setActiveGame(mostRecentGame.current));
+            postTick(SERVER_URL, uuid).then(updateLogbook);
         } else {
             alert("Wrong answer");
         }
-    }, [updateLogbook]);
+    }, [game, updateLogbook]);
 
     const undoAction = useCallback(() => {
         if (promptMatches("Enter the magic word", "Abracadabra", "nope")) {
-            postUndoAction(SERVER_URL, uuid).then(updateLogbook).then(() => setActiveGame(mostRecentGame.current));
+            postUndoAction(SERVER_URL, uuid).then(updateLogbook);
         } else {
             alert("Wrong answer");
         }
-    }, [updateLogbook]);
+    }, [game, updateLogbook]);
 
     return (
         <div>
             <h1>
-                {game.current.name}
+                {game.name}
             </h1>
             <div className="logbook-board-container">
-                <Logbook logbook={game.current?.logbook} activeGame={activeGame} setActiveGame={setActiveGame} />
+                <Logbook logbook={game.logbook} activeGame={activeGame} setActiveGame={setActiveGame} />
                 <Board board={state.$BOARD}/>
             </div>
             <button onClick={() => advanceTick()}>Next Day</button>
             <button onClick={() => undoAction()}>Undo Previous Action</button>
-            <ActionSelector enabled={true} uuid={uuid} players={state.$PLAYERS.elements} update={updateLogbook} />
+            <ActionSelector enabled={activeGame === game.logbook.length} uuid={uuid} players={state.$PLAYERS.elements} update={updateLogbook} />
         </div>
     );
 }

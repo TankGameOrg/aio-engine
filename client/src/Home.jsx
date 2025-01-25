@@ -8,7 +8,6 @@ function Home() {
 
     function updateGamesList() {
         fetchGames(SERVER_URL).then(res => res.json()).then(data => {
-            console.log(data);
             setGamesList(data);
             setTimeout(updateGamesList, 30000);
         });

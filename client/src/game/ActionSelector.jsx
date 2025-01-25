@@ -26,7 +26,6 @@ function ActionSelector({players, uuid, enabled, update}) {
 
     function getPossibleActions(playerName) {
         fetchPossibleActions(SERVER_URL, uuid, playerName).then(res => res.json()).then(data => {
-            console.log(data);
             setPossibleActions(data);
         });
     }
@@ -63,7 +62,7 @@ function ActionSelector({players, uuid, enabled, update}) {
                 }} key={parameter.name} />) }
             </div>
             { selectedAction.name === DEFAULT_STRING ? <></> :
-                <button disabled={ Object.keys(chosenActionParameters).length !== selectedAction.parameters.length} onClick={
+                <button disabled={ Object.keys(chosenActionParameters).length !== selectedAction.parameters.length } onClick={
                     () => {
                         const entry = {};
                         Object.values(chosenActionParameters).map((parameter) => entry[parameter.attribute] = parameter.selected);
