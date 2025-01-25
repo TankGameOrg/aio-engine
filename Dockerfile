@@ -2,8 +2,8 @@ FROM node:alpine AS client-build
 
 WORKDIR /build/
 
-COPY client/package* /build/
-RUN npm ci
+COPY client/package.json /build/
+RUN npm install
 COPY client/ /build/
 RUN npm run build
 
