@@ -12,8 +12,10 @@ import pro.trevor.tankgame.rule.apply.ApplyRule;
 import pro.trevor.tankgame.rule.apply.ApplyRuleset;
 import pro.trevor.tankgame.rule.apply.TargetApplyRule;
 import pro.trevor.tankgame.rule.impl.action.ExampleAction;
+import pro.trevor.tankgame.rule.impl.action.ExampleMove;
 import pro.trevor.tankgame.rule.impl.apply.ModifyAttribute;
 import pro.trevor.tankgame.state.board.unit.Tank;
+import pro.trevor.tankgame.util.Position;
 
 public class DefaultRulesetRegister implements RulesetRegister {
 
@@ -27,6 +29,9 @@ public class DefaultRulesetRegister implements RulesetRegister {
         actionRuleset.add(
                 new Description("ExampleAction", "An example rule that applies only if the player has a tank on the board"),
                 new ActionRule(new Predicate(), new ExampleAction(), new Parameter<>("Gold", Attribute.GOLD, (state, player) -> new DiscreteValueBound<>(Attribute.GOLD, 0, 1 ,2))));
+        actionRuleset.add(
+                new Description("ExampleMove", "An example rule that applies only if the player has a tank on the board"),
+                new ActionRule(new Predicate(), new ExampleMove(), new Parameter<>("Position", Attribute.TARGET_POSITION, (state, player) -> new DiscreteValueBound<>(Attribute.TARGET_POSITION, new Position(0, 1), new Position(1, 0)))));
     }
 
     @Override

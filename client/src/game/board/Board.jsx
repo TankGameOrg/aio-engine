@@ -1,7 +1,27 @@
 import BoardCell from "./BoardCell.jsx";
 import BoardOuterCell from "./BoardOuterCell.jsx";
+import {stringToPosition} from "../../util/position.js";
 
-function Board({board}) {
+function arrayContainsPosition(array, position) {
+    if (array === undefined || array === null || array.length === 0) {
+        return false;
+    }
+
+    for (let i = 0; i < array.length; ++i) {
+        let element = array[i];
+
+        if (typeof element == "string" || element instanceof String) {
+            element = stringToPosition(element);
+        }
+
+        if (element.x === position.x && element.y === position.y) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function Board({board, selectMode, selectPosition, positionOptions, clearSelectionMode}) {
     const { units, floors, width, height } = board;
 
     if (width === 0 || height === 0) {
@@ -34,7 +54,19 @@ function Board({board}) {
             { unitBoard.map((row, rowIndex) =>
                 <div className="board-row" key={rowIndex}>
                     <BoardOuterCell number={rowIndex + 1} isLetter={false} />
-                    { row.map((element, columnIndex) => <BoardCell key={`${rowIndex}:${columnIndex}`} unit={element} floor={floorBoard[rowIndex][columnIndex]} onClick={() => {}} />) }
+                    { row.map((element, columnIndex) =>
+                        <BoardCell
+                            key={`${columnIndex}:${rowIndex}`}
+                            unit={element}
+                            floor={floorBoard[columnIndex][rowIndex]}
+                            onClick={() => {
+                                selectPosition.current(columnIndex, rowIndex);
+                                clearSelectionMode();
+                            }}
+                            selectMode={selectMode}
+                            enabled={selectMode && arrayContainsPosition(positionOptions, {x: columnIndex, y: rowIndex})}
+                        />
+                    )}
                 </div>
             )}
         </div>

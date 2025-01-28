@@ -18,6 +18,7 @@
     position: relative;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
     margin: 0;
 
     /* 100% - (2 * border + 2 * inset)px */
@@ -35,11 +36,23 @@
     position: relative;
     justify-content: center;
     align-items: center;
+    overflow: hidden;
     margin: 0;
     width: 100%;
     height: 100%;
 
     font-size: 16px;
+}
+
+.board-cell-disabled {
+    opacity: 0.3;
+    background: #666;
+    cursor: auto;
+}
+
+.board-cell-enabled {
+    opacity: 1.0;
+    cursor: pointer;
 }
 
 

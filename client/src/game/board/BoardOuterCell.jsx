@@ -1,7 +1,6 @@
 import "./BoardCell.css"
 
 function BoardOuterCell({number, isLetter}) {
-
     let text;
     if (isLetter) {
         if (number === 0) {

@@ -1,10 +1,6 @@
-import {useState} from "react";
 import "./BoardCell.css"
 
-function BoardCell({unit, floor, onClick}) {
-
-    const [popup, setPopup] = useState(false);
-
+function BoardCell({unit, floor, selectMode, enabled, onClick}) {
     const unitClass = unit?.class;
     const floorClass =  floor?.class;
 
@@ -27,8 +23,21 @@ function BoardCell({unit, floor, onClick}) {
         background = "board-cell-background-gray"
     }
 
+    let cellEnabledClass = "";
+    if (selectMode) {
+        if (enabled) {
+            cellEnabledClass = "board-cell-enabled";
+        } else {
+            cellEnabledClass = "board-cell-disabled";
+        }
+    }
+
     return (
-        <div className={`board-cell ${background}`} onMouseEnter={() => setPopup(true)} onMouseLeave={() => setPopup(false)}>
+        <div className={`board-cell ${background} ${cellEnabledClass}`} onClick={() => {
+            if (enabled) {
+                onClick();
+            }
+        }}>
             <span className="board-cell-content">{text}</span>
         </div>
     );

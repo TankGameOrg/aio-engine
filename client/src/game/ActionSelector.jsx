@@ -3,7 +3,7 @@ import {SERVER_URL} from "../util/constants.js";
 import {useEffect, useState} from "react";
 import ParameterSelector from "./ParameterSelector.jsx";
 
-function ActionSelector({players, uuid, enabled, update}) {
+function ActionSelector({players, uuid, enabled, update, setPositionOptions, selectPositionFunction}) {
     if (!enabled) {
         return (<></>);
     }
@@ -49,17 +49,34 @@ function ActionSelector({players, uuid, enabled, update}) {
             <div className="action-select">
                 { possibleActions.possible_actions?.map((action) =>
                     <div key={action.name}>
-                        <input type="radio" name="action" value={action.name} id={action.name} onClick={() => {setSelectedAction(action)}} />
+                        <input type="radio"
+                               name="action"
+                               value={action.name}
+                               id={action.name}
+                               onClick={() => setSelectedAction(action)}
+                        />
                         <label title={action.description}>{action.name}</label>
                     </div>
                 )}
             </div>
             <div className="action-parameters">
-                { selectedAction.parameters?.map((parameter) => <ParameterSelector parameter={parameter} callback={(parameter) => {
-                    const newChosenActionParameters = {...chosenActionParameters};
-                    newChosenActionParameters[parameter.name] = parameter;
-                    setChosenActionParameters(newChosenActionParameters);
-                }} key={parameter.name} />) }
+                { selectedAction.parameters?.map((parameter) => {
+                    let positionsToReport = [];
+                    if (parameter.type === "Position") {
+                        positionsToReport = parameter.values;
+                    }
+                    return <ParameterSelector
+                        parameter={parameter}
+                        callback={(parameter) => {
+                            const newChosenActionParameters = {...chosenActionParameters};
+                            newChosenActionParameters[parameter.name] = parameter;
+                            setChosenActionParameters(newChosenActionParameters);
+                        }}
+                        key={parameter.name}
+                        handlePositionSelection={() => setPositionOptions(positionsToReport)}
+                        selectPositionFunction={selectPositionFunction}
+                    />
+                })}
             </div>
             { selectedAction.name === DEFAULT_STRING ? <></> :
                 <button disabled={ Object.keys(chosenActionParameters).length !== selectedAction.parameters.length } onClick={

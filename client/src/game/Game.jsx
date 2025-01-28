@@ -1,7 +1,7 @@
 import {useParams} from "react-router-dom";
 import {fetchGame, fetchState, postTick, postUndoAction} from "../util/fetch.js";
 import {SERVER_URL} from "../util/constants.js";
-import {useCallback, useEffect, useState} from "react";
+import {useCallback, useEffect, useRef, useState} from "react";
 import Board from "./board/Board.jsx";
 import promptMatches from "../util/prompt.js";
 import Logbook from "./Logbook.jsx";
@@ -29,8 +29,10 @@ function Game() {
         logbook: []
     });
 
+    const [positionOptions, setPositionOptions] = useState([]);
+    const selectPositionFunction = useRef(() => {});
+
     const updateLogbook = useCallback(() => {
-        console.log("update logbook");
         return fetchGame(SERVER_URL, uuid).then(res => res.json()).then(data => {
             const previousLogbookLength = game.logbook.length;
             setGame({...game, logbook: data.logbook, name: data.name});
@@ -79,11 +81,18 @@ function Game() {
             </h1>
             <div className="logbook-board-container">
                 <Logbook logbook={game.logbook} activeGame={activeGame} setActiveGame={setActiveGame} />
-                <Board board={state.$BOARD}/>
+                <Board board={state.$BOARD} selectMode={positionOptions.length > 0} positionOptions={positionOptions} selectPosition={selectPositionFunction} clearSelectionMode={() => setPositionOptions([])} />
             </div>
             <button onClick={() => advanceTick()}>Next Day</button>
             <button onClick={() => undoAction()}>Undo Previous Action</button>
-            <ActionSelector enabled={activeGame === game.logbook.length} uuid={uuid} players={state.$PLAYERS.elements} update={updateLogbook} />
+            <ActionSelector
+                enabled={activeGame === game.logbook.length}
+                uuid={uuid}
+                players={state.$PLAYERS.elements}
+                update={updateLogbook}
+                setPositionOptions={setPositionOptions}
+                selectPositionFunction={selectPositionFunction}
+            />
         </div>
     );
 }
