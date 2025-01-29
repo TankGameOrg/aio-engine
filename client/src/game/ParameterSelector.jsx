@@ -1,5 +1,6 @@
 import {useState} from "react";
 import {positionToString} from "../util/position.js";
+import "./ActionSelector.css"
 
 function ParameterSelector({parameter, callback, handlePositionSelection, selectPositionFunction}) {
     const DEFAULT_SELECTED_POSITION = {};
@@ -52,7 +53,7 @@ function ParameterSelector({parameter, callback, handlePositionSelection, select
     }
 
     return (
-        <div>
+        <div className="select-margin">
             <span>{parameter.name}: {selector}</span>
         </div>
     );

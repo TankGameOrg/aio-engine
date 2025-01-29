@@ -2,6 +2,7 @@ import {fetchPossibleActions, postAction} from "../util/fetch.js";
 import {SERVER_URL} from "../util/constants.js";
 import {useEffect, useState} from "react";
 import ParameterSelector from "./ParameterSelector.jsx";
+import "./ActionSelector.css"
 
 function ActionSelector({players, uuid, enabled, update, setPositionOptions, selectPositionFunction}) {
     if (!enabled) {
@@ -38,7 +39,7 @@ function ActionSelector({players, uuid, enabled, update, setPositionOptions, sel
 
     return (
         <div>
-            <div className="player-select">
+            <div className="player-select select-margin">
                 { players.map((playerObject) =>
                     <div key={playerObject.$NAME}>
                         <input type="radio" name="player" value={playerObject.$NAME} id={playerObject.$NAME} onClick={() => setPlayer(playerObject.$NAME)} />
@@ -46,9 +47,9 @@ function ActionSelector({players, uuid, enabled, update, setPositionOptions, sel
                     </div>
                 )}
             </div>
-            <div className="action-select">
+            <div className="action-select select-margin">
                 { possibleActions.possible_actions?.map((action) =>
-                    <div key={action.name}>
+                    <div key={action.name} className="select-margin">
                         <input type="radio"
                                name="action"
                                value={action.name}
@@ -59,7 +60,7 @@ function ActionSelector({players, uuid, enabled, update, setPositionOptions, sel
                     </div>
                 )}
             </div>
-            <div className="action-parameters">
+            <div className="action-parameters select-margin">
                 { selectedAction.parameters?.map((parameter) => {
                     let positionsToReport = [];
                     if (parameter.type === "Position") {
