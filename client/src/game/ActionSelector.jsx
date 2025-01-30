@@ -89,7 +89,13 @@ function ActionSelector({players, uuid, enabled, update, setPositionOptions, sel
                             name: player,
                             class: "PlayerRef",
                         };
-                        postAction(SERVER_URL, uuid, entry).then(() => update());
+                        postAction(SERVER_URL, uuid, entry).then((res) => res.json()).then((json) => {
+                            if (json.error) {
+                                console.log(json.message);
+                            } else {
+                                update()
+                            }
+                        });
                         setPlayer(DEFAULT_STRING);
                         setPossibleActions(DEFAULT_POSSIBLE_ACTIONS);
                         setSelectedAction(DEFAULT_SELECTED_ACTION);

@@ -12,29 +12,34 @@ import pro.trevor.tankgame.util.Position;
 
 import java.util.Optional;
 
-public class ExampleMove implements Action {
+public class Move implements Action {
     @Override
     public Error apply(State state, LogEntry entry) {
-        PlayerRef subject = entry.getUnsafe(Attribute.SUBJECT);
+        Optional<PlayerRef> maybeSubject = entry.get(Attribute.SUBJECT);
+        if (maybeSubject.isEmpty()) {
+            return new Error(Error.Type.OTHER, "Log entry does not contain a subject player");
+        }
+
+        PlayerRef subject = maybeSubject.get();
+        Optional<Tank> maybeTank = state.getTankForPlayerRef(subject);
+        if (maybeTank.isEmpty()) {
+            return new Error(Error.Type.OTHER, "Log entry does not contain a subject with a corresponding tank");
+        }
 
         Optional<Position> maybePosition = entry.get(Attribute.TARGET_POSITION);
         if (maybePosition.isEmpty()) {
             return new Error(Error.Type.OTHER, "Log entry does not contain a position");
         }
 
-        Optional<Tank> maybeTank = state.getTankForPlayerRef(subject);
-        if (maybeTank.isEmpty()) {
-            return new Error(Error.Type.OTHER, "Log entry does not contain a subject with a corresponding tank");
-        }
-
-        Position position = maybePosition.get();
         Tank tank = maybeTank.get();
+        Position position = maybePosition.get();
 
         Position oldPosition = tank.getPosition();
 
+        tank.put(Attribute.CAN_ACT, false);
         tank.setPosition(position);
-        state.getBoard().putUnit(tank);
         state.getBoard().putUnit(new EmptyUnit(oldPosition));
+        state.getBoard().putUnit(tank);
 
         return Error.NONE;
     }

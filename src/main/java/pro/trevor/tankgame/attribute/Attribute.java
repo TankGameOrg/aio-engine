@@ -21,6 +21,7 @@ public class Attribute<E> {
     // Tank attributes
     public static final Attribute<PlayerRef> PLAYER_REF = new Attribute<>("PLAYER_REF", PlayerRef.class);
     public static final Attribute<Integer> GOLD = new Attribute<>("GOLD", Integer.class);
+    public static final Attribute<Boolean> CAN_ACT = new Attribute<>("CAN_ACT", Boolean.class);
     public static final Attribute<Integer> ACTION_POINTS = new Attribute<>("ACTIONS", Integer.class);
     public static final Attribute<Integer> RANGE = new Attribute<>("RANGE", Integer.class);
     public static final Attribute<Integer> SPEED = new Attribute<>("SPEED", Integer.class);
