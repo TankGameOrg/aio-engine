@@ -71,10 +71,10 @@ function ActionSelector({players, uuid, enabled, update, setPositionOptions, sel
     }, [player, selectedAction, chosenActionParameters]);
 
     return (
-        <div>
+        <div className="selector-container">
             <div className="player-select select-margin">
                 { players.map((playerObject) =>
-                    <div key={playerObject.$NAME}>
+                    <div key={playerObject.$NAME} className="select-margin">
                         <input type="radio" name="player" value={playerObject.$NAME} id={playerObject.$NAME} onClick={() => {
                             setPlayer(playerObject.$NAME);
                             setSelectedAction(DEFAULT_SELECTED_ACTION);

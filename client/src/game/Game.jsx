@@ -32,33 +32,29 @@ function Game() {
     const [positionOptions, setPositionOptions] = useState([]);
     const selectPositionFunction = useRef(() => {});
     const clearActionSelectorFunction = useRef(() => {});
-    const timer = useRef(null);
+
+    const updateActiveGame = useCallback((newGame) => {
+        if (activeGame === newGame - 1 || activeGame > newGame) {
+            setActiveGame(newGame);
+        }
+    }, [activeGame]);
 
     const updateLogbook = useCallback(() => {
         return fetchGame(SERVER_URL, uuid).then(res => res.json()).then(data => {
-            const previousLogbookLength = game.logbook.length;
             setGame({...game, logbook: data.logbook, name: data.name});
-            if (activeGame === previousLogbookLength) {
-                setActiveGame(data.logbook.length);
-                if (previousLogbookLength !== data.logbook.length) {
-                    clearActionSelectorFunction.current();
-                }
-            }
+            updateActiveGame(data.logbook.length);
         });
-    }, [activeGame, game]);
+    }, [game, updateActiveGame]);
 
-    const updateLogbookFromServerForever = useCallback(() => {
-        if (timer.current !== null) {
-            clearTimeout(timer.current);
-        }
+    function updateLogbookForever() {
         updateLogbook().then(() => {
-            timer.current = setTimeout(updateLogbookFromServerForever, 2500);
-        });
-    }, [updateLogbook]);
+            setTimeout(updateLogbookForever, 2000);
+        })
+    }
 
     useEffect(() => {
-        updateLogbookFromServerForever();
-    }, [updateLogbookFromServerForever]);
+        updateLogbookForever();
+    }, []);
 
     useEffect(() => {
         fetchState(SERVER_URL, uuid, activeGame).then(res => res.json()).then(data => {
@@ -68,19 +64,19 @@ function Game() {
 
     const advanceTick = useCallback(() => {
         if (promptMatches("Enter the magic word", "Abracadabra", "dawn")) {
-            postTick(SERVER_URL, uuid).then(updateLogbook);
+            postTick(SERVER_URL, uuid).then(updateLogbook).then(clearActionSelectorFunction.current);
         } else {
             alert("Wrong answer");
         }
-    }, [game, updateLogbook]);
+    }, [updateLogbook]);
 
     const undoAction = useCallback(() => {
         if (promptMatches("Enter the magic word", "Abracadabra", "nope")) {
-            postUndoAction(SERVER_URL, uuid).then(updateLogbook);
+            postUndoAction(SERVER_URL, uuid).then(updateLogbook).then(clearActionSelectorFunction.current);
         } else {
             alert("Wrong answer");
         }
-    }, [game, updateLogbook]);
+    }, [updateLogbook]);
 
     return (
         <div>
