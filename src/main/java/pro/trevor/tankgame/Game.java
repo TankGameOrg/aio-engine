@@ -140,16 +140,47 @@ public class Game {
             possibleAction.put("name", ruleDescription.name());
             possibleAction.put("description", ruleDescription.description());
 
-            JSONArray parametersArray = new JSONArray();
-            for (Parameter<?> parameter : rule.getParameters()) {
-                parametersArray.put(parameter.possibleParameters(state, player).toJson().put("name", parameter.getName()));
+            List<Error> preconditionErrors = rule.getPredicate().test(state, player);
+            if (preconditionErrors.stream().anyMatch((error) -> error.type() == Error.Type.PRECONDITION)) {
+                continue;
+            } else if (!preconditionErrors.isEmpty()) {
+                possibleAction.put("error", preconditionErrors.stream().map(Error::message).reduce("",  (left, right) -> left + "\n" + right));
+            } else {
+                JSONArray parametersArray = new JSONArray();
+                for (Parameter<?> parameter : rule.getParameters()) {
+                    parametersArray.put(parameter.possibleParameters(state, player).toJson().put("name", parameter.getName()));
+                }
+                possibleAction.put("parameters", parametersArray);
             }
-            possibleAction.put("parameters", parametersArray);
-
             possibleActionsArray.put(possibleAction);
         }
 
         return response.put("possible_actions", possibleActionsArray);
+    }
+
+    public JSONObject checkActionConditions(LogEntry entry) {
+        PlayerRef subjectRef = entry.getUnsafe(Attribute.SUBJECT);
+        String actionName = entry.getUnsafe(Attribute.ACTION);
+        Optional<Player> maybePlayer = state.getPlayer(subjectRef);
+        Optional<Pair<Description, ActionRule>> maybeAction = ruleset.getPlayerActionRuleset().get(actionName);
+
+        if (maybePlayer.isEmpty()) {
+            return jsonError("No player found for given subject: " + subjectRef);
+        }
+
+        if (maybeAction.isEmpty()) {
+            return jsonError("No action rule found for given action: " + actionName);
+        }
+
+        ActionRule rule = maybeAction.get().right();
+
+        Error error = rule.getPredicate().test(state, entry);
+
+        if (error == Error.NONE) {
+            return jsonSuccess();
+        } else {
+            return jsonError(error.message());
+        }
     }
 
     private static JSONObject jsonError(String message) {

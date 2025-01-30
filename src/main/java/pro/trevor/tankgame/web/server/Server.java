@@ -78,6 +78,24 @@ public class Server {
         return gameInfoJson.toString();
     }
 
+    @PostMapping("/game/{uuid}/validate")
+    public String postUserValidateActionParameters(@PathVariable(name = "uuid") String uuidString, @RequestBody String requestBody) {
+        if (!Util.isUUID(uuidString)) {
+            return error(new JSONObject().put("message", "Invalid game UUID"));
+        }
+
+        UUID uuid = UUID.fromString(uuidString);
+        GameInfo gameInfo = storage.getGameInfoByUUID(uuid);
+
+        if (gameInfo == null) {
+            return error(new JSONObject().put("message", "Invalid game UUID"));
+        }
+
+        LogEntry logEntry = new LogEntry(new JSONObject(requestBody));
+
+        return gameInfo.game().checkActionConditions(logEntry).toString();
+    }
+
     @PostMapping("/game/{uuid}/action")
     public String postGameAction(@PathVariable(name = "uuid") String uuidString, @RequestBody String requestBody) {
         if (!Util.isUUID(uuidString)) {

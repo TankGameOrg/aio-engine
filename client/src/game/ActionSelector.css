@@ -1,3 +1,7 @@
 .select-margin {
     margin: 10px 0;
 }
+
+.label-strikethrough {
+    text-decoration: line-through;
+}

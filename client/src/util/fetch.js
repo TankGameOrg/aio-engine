@@ -18,6 +18,14 @@ function fetchPossibleActions(url, uuid, playerName) {
     return fetch(`${url}/game/${uuid}/actions/${encodeURIComponent(playerName)}`, {});
 }
 
+function validateActionParameters(url, uuid, entry) {
+    return fetch(`${url}/game/${uuid}/validate`,
+        {
+            method: 'POST',
+            body: JSON.stringify(entry),
+        });
+}
+
 function postAction(url, uuid, entry) {
     return fetch(`${url}/game/${uuid}/action`,
         {
@@ -42,4 +50,4 @@ function postTick(url, uuid) {
     );
 }
 
-export { fetchGames, fetchGame, fetchState, fetchCurrentGameNumber, fetchPossibleActions, postAction, postUndoAction, postTick };
+export { fetchGames, fetchGame, fetchState, fetchCurrentGameNumber, fetchPossibleActions, validateActionParameters, postAction, postUndoAction, postTick };

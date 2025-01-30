@@ -5,8 +5,8 @@ import {useCallback, useEffect, useRef, useState} from "react";
 import Board from "./board/Board.jsx";
 import promptMatches from "../util/prompt.js";
 import Logbook from "./Logbook.jsx";
-import "./Game.css";
 import ActionSelector from "./ActionSelector.jsx";
+import "./Game.css";
 
 function Game() {
     const uuid = useParams().uuid;
@@ -31,6 +31,8 @@ function Game() {
 
     const [positionOptions, setPositionOptions] = useState([]);
     const selectPositionFunction = useRef(() => {});
+    const clearActionSelectorFunction = useRef(() => {});
+    const timer = useRef(null);
 
     const updateLogbook = useCallback(() => {
         return fetchGame(SERVER_URL, uuid).then(res => res.json()).then(data => {
@@ -38,19 +40,25 @@ function Game() {
             setGame({...game, logbook: data.logbook, name: data.name});
             if (activeGame === previousLogbookLength) {
                 setActiveGame(data.logbook.length);
+                if (previousLogbookLength !== data.logbook.length) {
+                    clearActionSelectorFunction.current();
+                }
             }
         });
     }, [activeGame, game]);
 
-    function updateLogbookFromServerForever() {
+    const updateLogbookFromServerForever = useCallback(() => {
+        if (timer.current !== null) {
+            clearTimeout(timer.current);
+        }
         updateLogbook().then(() => {
-            setTimeout(updateLogbookFromServerForever, 2500);
+            timer.current = setTimeout(updateLogbookFromServerForever, 2500);
         });
-    }
+    }, [updateLogbook]);
 
     useEffect(() => {
         updateLogbookFromServerForever();
-    }, []);
+    }, [updateLogbookFromServerForever]);
 
     useEffect(() => {
         fetchState(SERVER_URL, uuid, activeGame).then(res => res.json()).then(data => {
@@ -92,6 +100,7 @@ function Game() {
                 update={updateLogbook}
                 setPositionOptions={setPositionOptions}
                 selectPositionFunction={selectPositionFunction}
+                clearActionSelectorFunction={clearActionSelectorFunction}
             />
         </div>
     );

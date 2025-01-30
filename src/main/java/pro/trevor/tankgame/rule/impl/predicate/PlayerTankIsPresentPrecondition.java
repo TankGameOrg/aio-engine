@@ -13,7 +13,7 @@ public class PlayerTankIsPresentPrecondition implements Precondition {
     public Error test(State state, Player player) {
         Optional<Tank> optionalTank = state.getTankForPlayerRef(player.toRef());
         if (optionalTank.isEmpty()) {
-            return new Error(Error.Type.OTHER, "Player tank is absent");
+            return new Error(Error.Type.PRECONDITION, "Player tank is absent");
         } else {
             return Error.NONE;
         }
