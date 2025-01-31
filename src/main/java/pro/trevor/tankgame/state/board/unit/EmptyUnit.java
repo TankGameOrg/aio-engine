@@ -7,7 +7,6 @@ import pro.trevor.tankgame.state.board.IUnit;
 import pro.trevor.tankgame.util.Position;
 import pro.trevor.tankgame.util.JsonType;
 
-
 @JsonType(name = "EmptyUnit")
 public class EmptyUnit extends Element implements IUnit {
 

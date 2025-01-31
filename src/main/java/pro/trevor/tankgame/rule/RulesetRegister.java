@@ -1,14 +1,18 @@
 package pro.trevor.tankgame.rule;
 
-import pro.trevor.tankgame.rule.action.ActionRuleset;
-import pro.trevor.tankgame.rule.apply.ApplyRuleset;
+import pro.trevor.tankgame.rule.handle.Damage;
+import pro.trevor.tankgame.rule.handle.Destroy;
+
+import java.util.List;
 
 public interface RulesetRegister {
 
     String getIdentifier();
-    void registerPlayerRules(ActionRuleset actionRuleset);
-    void registerTickRules(ApplyRuleset tickRuleset);
-    void registerConditionalRules(ApplyRuleset conditionalRuleset);
-    void registerInvariantRules(ApplyRuleset invariantRuleset);
+    void registerPlayerRules(Ruleset ruleset);
+    void registerTickRules(Ruleset ruleset);
+    void registerConditionalRules(Ruleset ruleset);
+    void registerInvariantRules(Ruleset ruleset);
+    void registerDamageHandlers(List<Damage> damageHandlers);
+    void registerDestroyHandlers(List<Destroy> destroysHandlers);
 
 }

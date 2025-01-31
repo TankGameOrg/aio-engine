@@ -35,7 +35,7 @@ public interface IRandom extends IJsonObject {
      * @return a random integer within [0, bound).
      */
     default int nextInt(int bound) {
-        return nextInt() % bound;
+        return Math.abs(nextInt()) % bound;
     }
 
     /**
@@ -49,7 +49,7 @@ public interface IRandom extends IJsonObject {
      * @return a random long within [0, bound).
      */
     default long nextLong(long bound) {
-        return nextLong() % bound;
+        return Math.abs(nextLong()) % bound;
     }
 
     /**

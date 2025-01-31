@@ -8,21 +8,14 @@ function codeToLocale(attribute) {
     return attribute.substring(1);
 }
 
-function localeToCode(attribute) {
-    if (attribute === undefined || attribute === null) {
-        return undefined;
-    }
-
-    return `$${attribute}`;
-}
-
 const ENGLISH_LOCALE = {
     GOLD: "Gold",
-    ACTIONS: "Action Points",
+    CAN_ACT: "Can Act",
     SPEED: "Speed",
     RANGE: "Range",
     POSITION: "Position",
     PLAYER_REF: "Player",
+    DURABILITY: "Durability",
 };
 
 export function objectToLocalizedObject(locale, object) {

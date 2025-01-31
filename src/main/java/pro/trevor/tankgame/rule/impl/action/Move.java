@@ -28,7 +28,7 @@ public class Move implements Action {
 
         Optional<Position> maybePosition = entry.get(Attribute.TARGET_POSITION);
         if (maybePosition.isEmpty()) {
-            return new Error(Error.Type.OTHER, "Log entry does not contain a position");
+            return new Error(Error.Type.OTHER, "Log entry does not contain a target position");
         }
 
         Tank tank = maybeTank.get();

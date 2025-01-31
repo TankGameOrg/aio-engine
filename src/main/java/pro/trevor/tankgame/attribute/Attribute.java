@@ -22,9 +22,10 @@ public class Attribute<E> {
     public static final Attribute<PlayerRef> PLAYER_REF = new Attribute<>("PLAYER_REF", PlayerRef.class);
     public static final Attribute<Integer> GOLD = new Attribute<>("GOLD", Integer.class);
     public static final Attribute<Boolean> CAN_ACT = new Attribute<>("CAN_ACT", Boolean.class);
-    public static final Attribute<Integer> ACTION_POINTS = new Attribute<>("ACTIONS", Integer.class);
     public static final Attribute<Integer> RANGE = new Attribute<>("RANGE", Integer.class);
     public static final Attribute<Integer> SPEED = new Attribute<>("SPEED", Integer.class);
+    public static final Attribute<Integer> DAMAGE_MODIFIER = new Attribute<>("DAMAGE_MODIFIER", Integer.class);
+    public static final Attribute<Integer> DEFENSE_MODIFIER = new Attribute<>("DEFENSE_MODIFIER", Integer.class);
     public static final Attribute<Integer> BOUNTY = new Attribute<>("BOUNTY", Integer.class);
 
     // Durability attributes
@@ -57,7 +58,6 @@ public class Attribute<E> {
     public static final Attribute<Integer> POWER = new Attribute<>("POWER", Integer.class);
 
     // Log entry attributes
-    public static final Attribute<Boolean> DO_TICK = new Attribute<>("DO_TICK", Boolean.class);
     public static final Attribute<String> ACTION = new Attribute<>("ACTION", String.class);
     public static final Attribute<PlayerRef> SUBJECT = new Attribute<>("SUBJECT", PlayerRef.class);
     public static final Attribute<Position> TARGET_POSITION = new Attribute<>("TARGET_POSITION", Position.class);
