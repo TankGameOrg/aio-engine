@@ -11,21 +11,27 @@ import pro.trevor.tankgame.state.meta.Player;
 import pro.trevor.tankgame.util.MathUtil;
 import pro.trevor.tankgame.util.Position;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 public class RepairPositionSupplier implements AvailableParameterSupplier<Position> {
 
     @Override
     public ParameterBound<Position> possibleParameters(State state, Player player) {
         Tank tank = state.getTankForPlayerRef(player.toRef()).get();
-        Set<Position> positions = MathUtil.allAdjacentMovablePositions(state.getBoard(), tank.getPosition());
-        positions.add(tank.getPosition());
+        Position[] positions = MathUtil.allAdjacentPositions(tank.getPosition());
 
-        List<Position> legalRepairs = positions.stream()
-                .filter((position) -> ((AttributeEntity) state.getBoard().getUnit(tank.getPosition()).get()).has(Attribute.DURABILITY))
-                .toList();
+        List<Position> legalPositions = new ArrayList<>();
+        legalPositions.add(tank.getPosition());
 
-        return new DiscreteValueBound<>(Attribute.TARGET_POSITION, legalRepairs);
+        for (Position position : positions) {
+            if (state.getBoard().isValidPosition(position) &&
+                    state.getBoard().getUnit(position).get() instanceof AttributeEntity entity &&
+                    entity.has(Attribute.DURABILITY)) {
+                legalPositions.add(position);
+            }
+        }
+
+        return new DiscreteValueBound<>(Attribute.TARGET_POSITION, legalPositions);
     }
 }
