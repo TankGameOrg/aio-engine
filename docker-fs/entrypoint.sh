@@ -4,6 +4,8 @@ if [ $# -gt 0 ]; then
     exec "$@"
 fi
 
+export STORAGE_PATH=/app/games
+
 trap "nginx -s stop" EXIT
 
 nginx

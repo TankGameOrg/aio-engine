@@ -22,5 +22,6 @@ RUN apk add --update --no-cache nginx
 COPY docker-fs/ /
 COPY --from=client-build /build/dist/ /app/static/
 COPY --from=server-build /build/target/*.jar /app/target/
+ADD games /app/games
 
 ENTRYPOINT ["/entrypoint.sh"]
