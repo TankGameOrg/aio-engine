@@ -1,6 +1,7 @@
 package pro.trevor.tankgame.attribute;
 
 import pro.trevor.tankgame.rule.impl.action.specialize.Specialty;
+import pro.trevor.tankgame.rule.impl.action.upgrade.Boon;
 import pro.trevor.tankgame.state.board.Board;
 import pro.trevor.tankgame.util.Position;
 import pro.trevor.tankgame.state.meta.Council;
@@ -27,6 +28,7 @@ public class Attribute<E> {
     public static final Attribute<Integer> DAMAGE_MODIFIER = new Attribute<>("DAMAGE_MODIFIER", Integer.class);
     public static final Attribute<Integer> DEFENSE_MODIFIER = new Attribute<>("DEFENSE_MODIFIER", Integer.class);
     public static final Attribute<Specialty> SPECIALTY = new Attribute<>("SPECIALTY", Specialty.class);
+    public static final Attribute<Boon> BOON = new Attribute<>("BOON", Boon.class);
 
     // Durability attributes
     public static final Attribute<Integer> DURABILITY = new Attribute<>("DURABILITY", Integer.class);
@@ -60,6 +62,7 @@ public class Attribute<E> {
     public static final Attribute<Position> TARGET_POSITION = new Attribute<>("TARGET_POSITION", Position.class);
     public static final Attribute<PlayerRef> TARGET_PLAYER = new Attribute<>("TARGET_PLAYER", PlayerRef.class);
     public static final Attribute<Specialty> TARGET_SPECIALTY = new Attribute<>("TARGET_SPECIALTY", Specialty.class);
+    public static final Attribute<Boon> TARGET_BOON = new Attribute<>("TARGET_BOON", Boon.class);
     public static final Attribute<Integer> DICE_ROLL = new Attribute<>("DICE_ROLL", Integer.class);
     public static final Attribute<Integer> TOTAL_DAMAGE = new Attribute<>("TOTAL_DAMAGE", Integer.class);
 

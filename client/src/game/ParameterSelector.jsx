@@ -18,7 +18,7 @@ function ParameterSelector({parameter, callback, handlePositionSelection, select
             return value;
         } else if (parameter.type === "PlayerRef") {
             return value?.name;
-        } else if (parameter.type === "Specialty") {
+        } else if (parameter.type === "Specialty" || parameter.type === "Boon") {
             return value?.variant;
         } else {
             return `Unhandled type ${parameter.type}`;

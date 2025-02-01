@@ -11,10 +11,10 @@ import java.util.List;
 
 @JsonType(name = "Specialty")
 public enum Specialty implements IJsonObject {
-    OFFENSE(new AttributeModifier(Attribute.DAMAGE_MODIFIER, 1), new AttributeModifier(Attribute.DEFENSE_MODIFIER, -1)),
-    DEFENSE(new AttributeModifier(Attribute.DAMAGE_MODIFIER, -1), new AttributeModifier(Attribute.DEFENSE_MODIFIER, 2)),
-    SCOUT(new AttributeModifier(Attribute.DEFENSE_MODIFIER, -1), new AttributeModifier(Attribute.SPEED, 1), new AttributeModifier(Attribute.RANGE, 1)),
-    MELEE(new AttributeModifier(Attribute.DAMAGE_MODIFIER, 1), new AttributeModifier(Attribute.DEFENSE_MODIFIER, -1), new AttributeModifier(Attribute.SPEED, 1), new AttributeModifier(Attribute.RANGE, -1))
+    Offense(new AttributeModifier(Attribute.DAMAGE_MODIFIER, 1), new AttributeModifier(Attribute.DEFENSE_MODIFIER, -1)),
+    Defense(new AttributeModifier(Attribute.DAMAGE_MODIFIER, -1), new AttributeModifier(Attribute.DEFENSE_MODIFIER, 2)),
+    Scout(new AttributeModifier(Attribute.DEFENSE_MODIFIER, -1), new AttributeModifier(Attribute.SPEED, 1), new AttributeModifier(Attribute.RANGE, 1)),
+    Melee(new AttributeModifier(Attribute.DAMAGE_MODIFIER, 1), new AttributeModifier(Attribute.DEFENSE_MODIFIER, -1), new AttributeModifier(Attribute.SPEED, 1), new AttributeModifier(Attribute.RANGE, -1))
     ;
 
     final List<AttributeModifier> modifiers;

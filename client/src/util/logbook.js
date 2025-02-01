@@ -12,8 +12,8 @@ export default function entryToText(entry) {
             return `${entry.subject.name} mines and finds ${entry.scrap} scrap`;
         } else if (entry.action === "Repair") {
             return `${entry.subject.name} repairs unit on ${positionToString(entry.target_position)}`;
-        } else if (entry.action === "Donate") {
-            return `${entry.subject.name} donates ${entry.scrap} to unit on ${positionToString(entry.target_position)}`;
+        } else if (entry.action === "Upgrade") {
+            return `${entry.subject.name} upgrades ${entry.target_boon.variant}`;
         } else {
             return `${entry.subject.name} takes action: ${entry.action}`;
         }

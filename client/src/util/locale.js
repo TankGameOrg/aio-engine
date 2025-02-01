@@ -47,7 +47,7 @@ export function codeObjectToString(object) {
             return positionToString(object);
         } else if (type === "PlayerRef") {
             return object.name;
-        } else if (type === "Specialty") {
+        } else if (type === "Specialty" || type === "Boon") {
             return object.variant;
         }
     }

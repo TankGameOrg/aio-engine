@@ -144,7 +144,7 @@ public class Game {
             if (preconditionErrors.stream().anyMatch((error) -> error.type() == Error.Type.PRECONDITION)) {
                 continue;
             } else if (!preconditionErrors.isEmpty()) {
-                possibleAction.put("error", preconditionErrors.stream().map(Error::message).reduce("",  (left, right) -> left + "\n" + right));
+                possibleAction.put("error", preconditionErrors.stream().map(Error::message).reduce("",  (left, right) -> left + "; " + right).substring(2));
             } else {
                 JSONArray parametersArray = new JSONArray();
                 for (Parameter<?> parameter : rule.getParameters()) {

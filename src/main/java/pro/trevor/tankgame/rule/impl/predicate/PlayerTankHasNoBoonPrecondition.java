@@ -9,7 +9,7 @@ import pro.trevor.tankgame.state.meta.Player;
 
 import java.util.Optional;
 
-public class PlayerTankHasNoSpecialtyPrecondition implements Precondition {
+public class PlayerTankHasNoBoonPrecondition implements Precondition {
     @Override
     public Error test(State state, Player player) {
         Optional<Tank> maybeTank = state.getTankForPlayerRef(player.toRef());
@@ -17,8 +17,8 @@ public class PlayerTankHasNoSpecialtyPrecondition implements Precondition {
             return new Error(Error.Type.PRECONDITION, "Player has no tank");
         }
 
-        if (maybeTank.get().has(Attribute.SPECIALTY)) {
-            return new Error(Error.Type.OTHER, "Tank already has a specialty");
+        if (maybeTank.get().has(Attribute.BOON)) {
+            return new Error(Error.Type.OTHER, "Tank already has an upgrade");
         }
 
         return Error.NONE;

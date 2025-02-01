@@ -18,12 +18,10 @@ import pro.trevor.tankgame.rule.impl.action.Move;
 import pro.trevor.tankgame.rule.impl.action.Repair;
 import pro.trevor.tankgame.rule.impl.action.Shoot;
 import pro.trevor.tankgame.rule.impl.action.specialize.Specialize;
+import pro.trevor.tankgame.rule.impl.action.upgrade.Upgrade;
 import pro.trevor.tankgame.rule.impl.apply.ModifyAttribute;
 import pro.trevor.tankgame.rule.impl.handle.*;
-import pro.trevor.tankgame.rule.impl.parameter.MovePositionSupplier;
-import pro.trevor.tankgame.rule.impl.parameter.RepairPositionSupplier;
-import pro.trevor.tankgame.rule.impl.parameter.ShootPositionSupplier;
-import pro.trevor.tankgame.rule.impl.parameter.SpecialtySupplier;
+import pro.trevor.tankgame.rule.impl.parameter.*;
 import pro.trevor.tankgame.rule.impl.predicate.*;
 import pro.trevor.tankgame.state.board.unit.Tank;
 import pro.trevor.tankgame.util.LineOfSight;
@@ -52,14 +50,19 @@ public class DefaultRulesetRegister implements RulesetRegister {
                 new ActionRule(new Predicate(List.of(new PlayerTankIsPresentPrecondition(), new PlayerTankCanActPreondition(), new PlayerTankHasAttributePrecondition(Attribute.RANGE)), List.of()),
                         new Shoot(ruleset), new Parameter<>("Target", Attribute.TARGET_POSITION, new ShootPositionSupplier(LineOfSight::hasLineOfSight))));
         actionRuleset.add(
-                new Description("Specialize", "Once per game, hone your tank to a specialized style of combat"),
-                new ActionRule(new Predicate(List.of(new PlayerTankIsPresentPrecondition(), new PlayerTankCanActPreondition(), new PlayerTankHasScrapPrecondition(4)), List.of()),
+                new Description("Repair", "Spend two scrap to repair a target tank, wall, or bridge within range for two durability"),
+                new ActionRule(new Predicate(List.of(new PlayerTankIsPresentPrecondition(), new PlayerTankHasScrapPrecondition(2), new PlayerTankCanActPreondition()), List.of()),
+                        new Repair(2, 2), new Parameter<>("Target", Attribute.TARGET_POSITION, new RepairPositionSupplier())));
+        actionRuleset.add(
+                new Description("Specialize", "Sped four scrap to hone your tank to a specialized style of combat"),
+                new ActionRule(new Predicate(List.of(new PlayerTankIsPresentPrecondition(), new PlayerTankHasScrapPrecondition(4), new PlayerTankCanActPreondition()), List.of()),
                         new Specialize(4), new Parameter<>("Specialty", Attribute.TARGET_SPECIALTY, new SpecialtySupplier()))
         );
         actionRuleset.add(
-                new Description("Repair", "Spend two scrap to repair a target tank, wall, or bridge within range for two durability"),
-                new ActionRule(new Predicate(List.of(new PlayerTankIsPresentPrecondition(), new PlayerTankCanActPreondition(), new PlayerTankHasScrapPrecondition(2)), List.of()),
-                        new Repair(2, 2), new Parameter<>("Target", Attribute.TARGET_POSITION, new RepairPositionSupplier())));
+                new Description("Upgrade", "Once per game, upgrade an attribute of your tank"),
+                new ActionRule(new Predicate(List.of(new PlayerTankIsPresentPrecondition(), new PlayerTankHasNoBoonPrecondition(), new PlayerTankHasScrapPrecondition(6), new PlayerTankCanActPreondition()), List.of()),
+                        new Upgrade(), new Parameter<>("Boon", Attribute.TARGET_BOON, new BoonSupplier()))
+        );
     }
 
     @Override
