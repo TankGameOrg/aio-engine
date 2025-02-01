@@ -56,9 +56,9 @@ function Board({board, selectMode, selectPosition, positionOptions, clearSelecti
                     <BoardOuterCell number={rowIndex + 1} isLetter={false} />
                     { row.map((element, columnIndex) =>
                         <BoardCell
-                            key={`${columnIndex}:${rowIndex}`}
+                            key={`${rowIndex}:${columnIndex}`}
                             unit={element}
-                            floor={floorBoard[columnIndex][rowIndex]}
+                            floor={floorBoard[rowIndex][columnIndex]}
                             onClick={() => {
                                 selectPosition.current(columnIndex, rowIndex);
                                 clearSelectionMode();

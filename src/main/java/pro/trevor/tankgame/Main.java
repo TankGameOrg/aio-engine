@@ -58,7 +58,7 @@ public class Main {
         LogEntry actionEntry = new LogEntry();
         actionEntry.put(Attribute.ACTION, "ExampleAction");
         actionEntry.put(Attribute.SUBJECT, new PlayerRef("TestPlayer"));
-        actionEntry.put(Attribute.GOLD, 1);
+        actionEntry.put(Attribute.SCRAP, 1);
 
         System.out.println(game.ingestEntry(actionEntry).toString(2));
 

@@ -8,6 +8,12 @@ export default function entryToText(entry) {
             return `${entry.subject.name} moves to ${positionToString(entry.target_position)}`;
         } else if (entry.action === "Specialize") {
             return `${entry.subject.name} specializes in ${entry.target_specialty.variant}`;
+        } else if (entry.action === "Mine") {
+            return `${entry.subject.name} mines and finds ${entry.scrap} scrap`;
+        } else if (entry.action === "Repair") {
+            return `${entry.subject.name} repairs unit on ${positionToString(entry.target_position)}`;
+        } else if (entry.action === "Donate") {
+            return `${entry.subject.name} donates ${entry.scrap} to unit on ${positionToString(entry.target_position)}`;
         } else {
             return `${entry.subject.name} takes action: ${entry.action}`;
         }

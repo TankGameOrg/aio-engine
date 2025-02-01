@@ -1,6 +1,5 @@
 package pro.trevor.tankgame.attribute;
 
-import pro.trevor.tankgame.rule.impl.action.specialize.Specialize;
 import pro.trevor.tankgame.rule.impl.action.specialize.Specialty;
 import pro.trevor.tankgame.state.board.Board;
 import pro.trevor.tankgame.util.Position;
@@ -18,11 +17,10 @@ public class Attribute<E> {
 
     // Element attributes
     public static final Attribute<Position> POSITION = new Attribute<>("POSITION", Position.class);
-    public static final Attribute<Integer> DAYS_REMAINING = new Attribute<>("DAYS_REMAINING", Integer.class);
 
     // Tank attributes
     public static final Attribute<PlayerRef> PLAYER_REF = new Attribute<>("PLAYER_REF", PlayerRef.class);
-    public static final Attribute<Integer> GOLD = new Attribute<>("GOLD", Integer.class);
+    public static final Attribute<Integer> SCRAP = new Attribute<>("SCRAP", Integer.class);
     public static final Attribute<Boolean> CAN_ACT = new Attribute<>("CAN_ACT", Boolean.class);
     public static final Attribute<Integer> RANGE = new Attribute<>("RANGE", Integer.class);
     public static final Attribute<Integer> SPEED = new Attribute<>("SPEED", Integer.class);

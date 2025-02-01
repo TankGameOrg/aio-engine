@@ -93,20 +93,15 @@ public class MathUtil {
         return output;
     }
 
-    public static boolean isOrthAdjToMine(State state, Position p) {
-        for (Position x : MathUtil.orthogonallyAdjacentPositions(p)) {
-            if (state.getBoard().getFloor(x).orElse(null) instanceof GoldMine) {
-                return true;
-            }
-        }
-        return false;
+    public static boolean isMine(State state, Position position) {
+        return state.getBoard().getFloor(position).map((floor) -> floor instanceof GoldMine).orElse(false);
     }
 
     public static void findAllConnectedMines(Set<Position> positions, State state, Position p) {
         if (!positions.contains(p)) {
             positions.add(p);
             Arrays.stream(MathUtil.orthogonallyAdjacentPositions(p))
-                    .filter((x) -> state.getBoard().getFloor(x).orElse(null) instanceof GoldMine)
+                    .filter((x) -> isMine(state, x))
                     .forEach((x) -> findAllConnectedMines(positions, state, x));
         }
     }

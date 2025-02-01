@@ -9,11 +9,9 @@ function codeToLocale(attribute) {
 }
 
 const ENGLISH_LOCALE = {
-    GOLD: "Gold",
-    CAN_ACT: "Can Act",
+    SCRAP: "Scrap",
     SPEED: "Speed",
     RANGE: "Range",
-    POSITION: "Position",
     PLAYER_REF: "Player",
     DURABILITY: "Durability",
     DAMAGE_MODIFIER: "Damage Modifier",

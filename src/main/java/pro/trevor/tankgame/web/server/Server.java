@@ -234,7 +234,7 @@ public class Server {
         LogEntry actionEntry = new LogEntry();
         actionEntry.put(Attribute.ACTION, "ExampleAction");
         actionEntry.put(Attribute.SUBJECT, new PlayerRef("TestPlayer"));
-        actionEntry.put(Attribute.GOLD, 1);
+        actionEntry.put(Attribute.SCRAP, 1);
 
         game.ingestEntry(actionEntry).toString(2);
 

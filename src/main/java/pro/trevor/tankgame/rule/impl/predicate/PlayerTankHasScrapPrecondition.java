@@ -9,7 +9,15 @@ import pro.trevor.tankgame.state.meta.Player;
 
 import java.util.Optional;
 
-public class PlayerTankHasNoSpecialtyPrecondition implements Precondition {
+public class PlayerTankHasScrapPrecondition implements Precondition {
+
+    private final int scrap;
+
+    public PlayerTankHasScrapPrecondition(int scrap) {
+        this.scrap = scrap;
+    }
+
+
     @Override
     public Error test(State state, Player player) {
         Optional<Tank> maybeTank = state.getTankForPlayerRef(player.toRef());
@@ -17,8 +25,10 @@ public class PlayerTankHasNoSpecialtyPrecondition implements Precondition {
             return new Error(Error.Type.PRECONDITION, "Player has no tank");
         }
 
-        if (maybeTank.get().has(Attribute.SPECIALTY)) {
-            return new Error(Error.Type.OTHER, "Tank already has a specialty");
+        Tank tank = maybeTank.get();
+
+        if (tank.getOrElse(Attribute.SCRAP, 0) < scrap) {
+            return new Error(Error.Type.OTHER, "Tank has insufficient scrap");
         }
 
         return Error.NONE;

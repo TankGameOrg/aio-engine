@@ -36,6 +36,7 @@ public class Specialize implements Action {
             return new Error(Error.Type.OTHER, "Target tank already has a specialty");
         }
 
+        tank.put(Attribute.CAN_ACT, false);
         tank.put(Attribute.SPECIALTY, specialty);
         specialty.apply(tank);
 
