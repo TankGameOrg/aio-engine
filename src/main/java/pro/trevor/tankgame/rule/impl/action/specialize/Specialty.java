@@ -29,6 +29,12 @@ public enum Specialty implements IJsonObject {
         }
     }
 
+    void remove(AttributeEntity entity) {
+        for (AttributeModifier modifier : modifiers) {
+            entity.put(modifier.attribute(), entity.getOrElse(modifier.attribute(), 0) - modifier.modifier());
+        }
+    }
+
     @Override
     public JSONObject toJson() {
         return new JSONObject();

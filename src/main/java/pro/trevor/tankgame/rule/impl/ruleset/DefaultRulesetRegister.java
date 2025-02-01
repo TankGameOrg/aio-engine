@@ -53,8 +53,8 @@ public class DefaultRulesetRegister implements RulesetRegister {
                         new Shoot(ruleset), new Parameter<>("Target", Attribute.TARGET_POSITION, new ShootPositionSupplier(LineOfSight::hasLineOfSight))));
         actionRuleset.add(
                 new Description("Specialize", "Once per game, hone your tank to a specialized style of combat"),
-                new ActionRule(new Predicate(List.of(new PlayerTankIsPresentPrecondition(), new PlayerTankHasNoSpecialtyPrecondition(), new PlayerTankCanActPreondition()), List.of()),
-                        new Specialize(), new Parameter<>("Specialty", Attribute.TARGET_SPECIALTY, new SpecialtySupplier()))
+                new ActionRule(new Predicate(List.of(new PlayerTankIsPresentPrecondition(), new PlayerTankCanActPreondition(), new PlayerTankHasScrapPrecondition(4)), List.of()),
+                        new Specialize(4), new Parameter<>("Specialty", Attribute.TARGET_SPECIALTY, new SpecialtySupplier()))
         );
         actionRuleset.add(
                 new Description("Repair", "Spend two scrap to repair a target tank, wall, or bridge within range for two durability"),
