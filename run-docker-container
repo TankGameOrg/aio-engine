@@ -1,0 +1,4 @@
+#!/bin/bash
+
+docker build -t tank-game-aio .
+docker run --rm --init -p 8080:8080 -it tank-game-aio
