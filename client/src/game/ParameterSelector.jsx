@@ -14,10 +14,12 @@ function ParameterSelector({parameter, callback, handlePositionSelection, select
     let selector = <div>Blank Selector</div>;
 
     function present(parameter, value) {
-        if (parameter.type === "Integer" || parameter.type === "String") {
+        if (parameter.type === "Integer" || parameter.type === "String" || parameter.type === "Boolean") {
             return value;
         } else if (parameter.type === "PlayerRef") {
             return value?.name;
+        } else if (parameter.type === "Specialty") {
+            return value?.variant;
         } else {
             return `Unhandled type ${parameter.type}`;
         }

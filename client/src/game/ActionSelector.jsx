@@ -73,7 +73,7 @@ function ActionSelector({players, uuid, enabled, update, setPositionOptions, sel
     return (
         <div className="selector-container">
             <div className="player-select select-margin">
-                { players.map((playerObject) =>
+                { players.sort((a, b) => a.$NAME.localeCompare(b.$NAME)).map((playerObject) =>
                     <div key={playerObject.$NAME} className="select-margin">
                         <input type="radio" name="player" value={playerObject.$NAME} id={playerObject.$NAME} onClick={() => {
                             setPlayer(playerObject.$NAME);
@@ -86,7 +86,7 @@ function ActionSelector({players, uuid, enabled, update, setPositionOptions, sel
                 )}
             </div>
             <div className="action-select select-margin">
-                { possibleActions.possible_actions?.map((action) =>
+                { possibleActions.possible_actions?.sort((a, b) => a.name.localeCompare(b.name))?.map((action) =>
                     <div key={action.name} className="select-margin">
                         <input type="radio"
                                name="action"

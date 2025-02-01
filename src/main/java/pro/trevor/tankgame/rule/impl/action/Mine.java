@@ -8,7 +8,7 @@ import pro.trevor.tankgame.state.State;
 import pro.trevor.tankgame.state.board.unit.Tank;
 import pro.trevor.tankgame.state.meta.PlayerRef;
 
-public class ExampleAction implements Action {
+public class Mine implements Action {
     @Override
     public Error apply(State state, LogEntry entry) {
         PlayerRef playerRef = entry.getUnsafe(Attribute.SUBJECT);

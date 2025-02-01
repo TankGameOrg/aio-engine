@@ -16,6 +16,11 @@ const ENGLISH_LOCALE = {
     POSITION: "Position",
     PLAYER_REF: "Player",
     DURABILITY: "Durability",
+    DAMAGE_MODIFIER: "Damage Modifier",
+    DEFENSE_MODIFIER: "Defense Modifier",
+    SPECIALTY: "Specialty",
+    TEAM: "Team",
+    GLORY: "Glory",
 };
 
 export function objectToLocalizedObject(locale, object) {
@@ -44,6 +49,8 @@ export function codeObjectToString(object) {
             return positionToString(object);
         } else if (type === "PlayerRef") {
             return object.name;
+        } else if (type === "Specialty") {
+            return object.variant;
         }
     }
     return `Unhandled type ${type}`;

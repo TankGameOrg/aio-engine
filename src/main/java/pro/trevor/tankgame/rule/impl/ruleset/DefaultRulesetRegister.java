@@ -13,15 +13,18 @@ import pro.trevor.tankgame.rule.apply.ApplyRuleset;
 import pro.trevor.tankgame.rule.apply.TargetApplyRule;
 import pro.trevor.tankgame.rule.handle.Damage;
 import pro.trevor.tankgame.rule.handle.Destroy;
-import pro.trevor.tankgame.rule.impl.action.ExampleAction;
+import pro.trevor.tankgame.rule.impl.action.Mine;
 import pro.trevor.tankgame.rule.impl.action.Move;
 import pro.trevor.tankgame.rule.impl.action.Shoot;
+import pro.trevor.tankgame.rule.impl.action.specialize.Specialize;
 import pro.trevor.tankgame.rule.impl.apply.ModifyAttribute;
 import pro.trevor.tankgame.rule.impl.handle.*;
 import pro.trevor.tankgame.rule.impl.parameter.MovePositionSupplier;
 import pro.trevor.tankgame.rule.impl.parameter.ShootPositionSupplier;
+import pro.trevor.tankgame.rule.impl.parameter.SpecialtySupplier;
 import pro.trevor.tankgame.rule.impl.predicate.PlayerTankCanActPreondition;
 import pro.trevor.tankgame.rule.impl.predicate.PlayerTankHasAttributePrecondition;
+import pro.trevor.tankgame.rule.impl.predicate.PlayerTankHasNoSpecialtyPrecondition;
 import pro.trevor.tankgame.rule.impl.predicate.PlayerTankIsPresentPrecondition;
 import pro.trevor.tankgame.state.board.unit.Tank;
 import pro.trevor.tankgame.util.LineOfSight;
@@ -40,15 +43,20 @@ public class DefaultRulesetRegister implements RulesetRegister {
         ActionRuleset actionRuleset = ruleset.getPlayerActionRuleset();
         actionRuleset.add(
                 new Description("ExampleAction", "An example rule that applies only if the player has a tank on the board; adds the specified amount of gold to the player's tank"),
-                new ActionRule(new Predicate(List.of(new PlayerTankCanActPreondition()), List.of()), new ExampleAction(), new Parameter<>("Gold", Attribute.GOLD, (state, player) -> new DiscreteValueBound<>(Attribute.GOLD, 0, 1 ,2))));
+                new ActionRule(new Predicate(List.of(new PlayerTankCanActPreondition()), List.of()), new Mine(), new Parameter<>("Gold", Attribute.GOLD, (state, player) -> new DiscreteValueBound<>(Attribute.GOLD, 0, 1 ,2))));
         actionRuleset.add(
                 new Description("Move", "Move your tank to a new position on the game board"),
-                new ActionRule(new Predicate(List.of(new PlayerTankIsPresentPrecondition(), new PlayerTankCanActPreondition(), new PlayerTankHasAttributePrecondition(Attribute.SPEED)), List.of()), new Move(),
-                        new Parameter<>("Position", Attribute.TARGET_POSITION, new MovePositionSupplier())));
+                new ActionRule(new Predicate(List.of(new PlayerTankIsPresentPrecondition(), new PlayerTankCanActPreondition(), new PlayerTankHasAttributePrecondition(Attribute.SPEED)), List.of()),
+                        new Move(), new Parameter<>("Position", Attribute.TARGET_POSITION, new MovePositionSupplier())));
         actionRuleset.add(
                 new Description("Shoot", "Shoot at a position to damage its occupant"),
                 new ActionRule(new Predicate(List.of(new PlayerTankIsPresentPrecondition(), new PlayerTankCanActPreondition(), new PlayerTankHasAttributePrecondition(Attribute.RANGE)), List.of()),
                         new Shoot(ruleset), new Parameter<>("Position", Attribute.TARGET_POSITION, new ShootPositionSupplier(LineOfSight::hasLineOfSight))));
+        actionRuleset.add(
+                new Description("Specialize", "Hone your tank to "),
+                new ActionRule(new Predicate(List.of(new PlayerTankIsPresentPrecondition(), new PlayerTankHasNoSpecialtyPrecondition()), List.of()),
+                        new Specialize(), new Parameter<>("Specialty", Attribute.TARGET_SPECIALTY, new SpecialtySupplier()))
+        );
     }
 
     @Override
@@ -69,11 +77,13 @@ public class DefaultRulesetRegister implements RulesetRegister {
 
     @Override
     public void registerDamageHandlers(List<Damage> damageHandlers) {
+        damageHandlers.add(new Damage(new HasDurabilityPredicate().and(new IsTankPredicate()), new DamageDurabilityHandle(new int[]{1, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 6})));
         damageHandlers.add(new Damage(new HasDurabilityPredicate(), new DamageDurabilityHandle()));
     }
 
     @Override
     public void registerDestroyHandlers(List<Destroy> destroysHandlers) {
-        destroysHandlers.add(new Destroy(new HasZeroDurabilityPredicate(), new DestroyTankHandle(2)));
+        destroysHandlers.add(new Destroy(new HasZeroDurabilityPredicate().and(new IsTankPredicate()), new DestroyTankHandle(2)));
+        destroysHandlers.add(new Destroy(new HasZeroDurabilityPredicate(), new DestroyEntityHandle()));
     }
 }
