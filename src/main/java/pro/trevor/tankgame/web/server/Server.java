@@ -223,28 +223,6 @@ public class Server {
         return storage.readStateFromHistory(uuid, id).toJson().toString();
     }
 
-    @GetMapping("/test")
-    public String test() {
-        Game game = new Game(new DefaultRulesetRegister(), new State(new Board(3, 3), new Council(), new ListEntity<>(List.of(new Player("TestPlayer")))));
-        game.getState().getBoard().putUnit(new Tank(new PlayerRef("TestPlayer"), new Position(0, 0), Map.of()));
-        GameInfo gameInfo = new GameInfo("Test Game " + ((int) (Math.random() * 1000)), UUID.randomUUID(), game);
-
-        storage.saveInitialState(gameInfo);
-
-        LogEntry actionEntry = new LogEntry();
-        actionEntry.put(Attribute.ACTION, "ExampleAction");
-        actionEntry.put(Attribute.SUBJECT, new PlayerRef("TestPlayer"));
-        actionEntry.put(Attribute.SCRAP, 1);
-
-        game.ingestEntry(actionEntry).toString(2);
-
-        game.tick();
-
-        storage.saveGameAfterAction(gameInfo, actionEntry);
-
-        return success(new JSONObject().put("message", "Success"));
-    }
-
     public static String success(JSONObject data) {
         return data.put("error", false).toString();
     }
