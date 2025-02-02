@@ -65,7 +65,6 @@ public class Shoot implements Action {
             for (Destroy destroyHandler : ruleset.getDestroyHandlers()) {
                 if (destroyHandler.getPredicate().test(entity)) {
                     destroyHandler.getHandle().destroy(state, new TankCause(tank), entity, entry);
-                    break;
                 }
             }
         }

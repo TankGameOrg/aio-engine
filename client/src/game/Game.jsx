@@ -6,6 +6,7 @@ import Board from "./board/Board.jsx";
 import promptMatches from "../util/prompt.js";
 import Logbook from "./Logbook.jsx";
 import ActionSelector from "./ActionSelector.jsx";
+import Menu from "./Menu.jsx";
 import "./Game.css";
 
 function Game() {
@@ -24,17 +25,21 @@ function Game() {
             }
         }
     );
+
+    const UNLOADED_GAME_NAME = "Loading...";
+
     const [game, setGame] = useState({
-        name: "Loading...",
+        name: UNLOADED_GAME_NAME,
         logbook: []
     });
 
     const [positionOptions, setPositionOptions] = useState([]);
     const selectPositionFunction = useRef(() => {});
+    const selectPlayerForActionFunction = useRef(() => {});
     const clearActionSelectorFunction = useRef(() => {});
 
     const updateActiveGame = useCallback((newGame) => {
-        if (activeGame === newGame - 1 || activeGame > newGame) {
+        if (activeGame === newGame - 1 || activeGame > newGame || game.name === UNLOADED_GAME_NAME) {
             setActiveGame(newGame);
         }
     }, [activeGame]);
@@ -63,7 +68,7 @@ function Game() {
     }, [activeGame]);
 
     const advanceTick = useCallback(() => {
-        if (promptMatches("Enter the magic word", "Abracadabra", "dawn")) {
+        if (promptMatches("This action is only intended to be used by the admin\nEnter the magic word", "Abracadabra", "dawn")) {
             postTick(SERVER_URL, uuid).then(updateLogbook).then(clearActionSelectorFunction.current);
         } else {
             alert("Wrong answer");
@@ -71,31 +76,32 @@ function Game() {
     }, [updateLogbook]);
 
     const undoAction = useCallback(() => {
-        if (promptMatches("Enter the magic word", "Abracadabra", "nope")) {
+        if (promptMatches("This action is only intended to be used by the admin\nEnter the magic word", "Abracadabra", "nope")) {
             postUndoAction(SERVER_URL, uuid).then(updateLogbook).then(clearActionSelectorFunction.current);
         } else {
             alert("Wrong answer");
         }
     }, [updateLogbook]);
 
+    const gameIsCurrent = game.logbook.length === activeGame;
+
     return (
         <div>
-            <h1>
+            <h2>
                 {game.name}
-            </h1>
+            </h2>
             <div className="logbook-board-container">
                 <Logbook logbook={game.logbook} activeGame={activeGame} setActiveGame={setActiveGame} />
-                <Board board={state.$BOARD} selectMode={positionOptions.length > 0} positionOptions={positionOptions} selectPosition={selectPositionFunction} clearSelectionMode={() => setPositionOptions([])} />
+                <Board board={state.$BOARD} selectMode={positionOptions.length > 0} gameIsCurrent={gameIsCurrent} positionOptions={positionOptions} selectPosition={selectPositionFunction} clearSelectionMode={() => setPositionOptions([])} selectPlayerForActionFunction={selectPlayerForActionFunction} />
+                <Menu advanceTick={advanceTick} undoAction={undoAction}  />
             </div>
-            <button onClick={() => advanceTick()}>Next Day</button>
-            <button onClick={() => undoAction()}>Undo Previous Action</button>
             <ActionSelector
-                enabled={activeGame === game.logbook.length}
+                enabled={gameIsCurrent}
                 uuid={uuid}
-                players={state.$PLAYERS.elements}
                 update={updateLogbook}
                 setPositionOptions={setPositionOptions}
                 selectPositionFunction={selectPositionFunction}
+                selectPlayerForActionFunction={selectPlayerForActionFunction}
                 clearActionSelectorFunction={clearActionSelectorFunction}
             />
         </div>

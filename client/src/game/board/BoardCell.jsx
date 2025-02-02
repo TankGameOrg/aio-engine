@@ -1,8 +1,12 @@
 import "./BoardCell.css"
 import Popup from "reactjs-popup";
 import {codeObjectToString, ENGLISH_LOCALE, objectToArray, objectToLocalizedObject} from "../../util/locale.js";
+import {useState} from "react";
 
-function BoardCell({unit, floor, selectMode, enabled, onClick}) {
+function BoardCell({unit, floor, gameIsCurrent, selectMode, enabled, onClick, selectPlayer}) {
+
+    const [popupOpen, setPopupOpen] = useState(false);
+
     const unitClass = unit?.class;
     const floorClass =  floor?.class;
 
@@ -39,6 +43,8 @@ function BoardCell({unit, floor, selectMode, enabled, onClick}) {
         <div className={`board-cell ${background} ${cellEnabledClass}`} onClick={() => {
             if (selectMode && enabled) {
                 onClick();
+            } else {
+                setPopupOpen(true);
             }
         }}>
             <span className="board-cell-content">{text}</span>
@@ -55,21 +61,22 @@ function BoardCell({unit, floor, selectMode, enabled, onClick}) {
         unitAttributes = objectToArray(objectToLocalizedObject(ENGLISH_LOCALE, unit));
     }
 
-    // let floorAttributes = [];
-    // if (floor.class) {
-    //     floorAttributes = objectToArray(objectToLocalizedObject(ENGLISH_LOCALE, floor));
-    // }
-
     return (
-        <Popup position="top center" trigger={cell} arrow={false}>
-            <div className="popup-overlay"/>
-            <div className="popup-container">
-                <span className="popup-title">{unit?.class ?? "Empty"}</span>
-                { unitAttributes.map((pair) => <span key={pair.key}>{`${pair.key}: ${codeObjectToString(pair.value)}`}</span>) }
-                {floor?.class ? <span className="popup-title">{floor.class}</span> : <></>}
-
-            </div>
-        </Popup>
+        <>
+            { cell }
+            <Popup position="bottom center"  open={popupOpen} arrow={false} closeOnDocumentClick={true} onClose={() => setPopupOpen(false)}>
+                <div className="popup-overlay" />
+                <div className="popup-container">
+                    <span className="popup-title">{unit?.class ?? "Empty"}</span>
+                    { unitAttributes.map((pair) => <span key={pair.key}>{`${pair.key}: ${codeObjectToString(pair.value)}`}</span>) }
+                    {floor?.class ? <span className="popup-title">{floor.class}</span> : <></>}
+                    { (unit?.$PLAYER_REF && gameIsCurrent) ? <button onClick={() => {
+                        selectPlayer.current(unit?.$PLAYER_REF?.name);
+                        setPopupOpen(false);
+                    }}>Act</button> : <></> }
+                </div>
+            </Popup>
+        </>
     );
 
 

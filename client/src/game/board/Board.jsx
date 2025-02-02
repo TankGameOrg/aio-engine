@@ -21,7 +21,7 @@ function arrayContainsPosition(array, position) {
     return false;
 }
 
-function Board({board, selectMode, selectPosition, positionOptions, clearSelectionMode}) {
+function Board({board, selectMode, gameIsCurrent, selectPosition, positionOptions, clearSelectionMode, selectPlayerForActionFunction}) {
     const { units, floors, width, height } = board;
 
     if (width === 0 || height === 0) {
@@ -63,8 +63,10 @@ function Board({board, selectMode, selectPosition, positionOptions, clearSelecti
                                 selectPosition.current(columnIndex, rowIndex);
                                 clearSelectionMode();
                             }}
+                            gameIsCurrent={gameIsCurrent}
                             selectMode={selectMode}
                             enabled={selectMode && arrayContainsPosition(positionOptions, {x: columnIndex, y: rowIndex})}
+                            selectPlayer={selectPlayerForActionFunction}
                         />
                     )}
                 </div>

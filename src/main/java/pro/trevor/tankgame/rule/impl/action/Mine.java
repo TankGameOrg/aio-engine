@@ -43,19 +43,12 @@ public class Mine implements Action {
         int numerator;
         int denominator;
 
-        switch (numberOfMines) {
-            case 0 -> {
-                numerator = 1;
-                denominator = 4;
-            }
-            case 1 -> {
-                numerator = 1;
-                denominator = 3;
-            }
-            default -> {
-                numerator = numberOfMines - 1;
-                denominator = numberOfMines;
-            }
+        if (numberOfMines == 0) {
+            numerator = 1;
+            denominator = 4;
+        } else {
+            numerator = numberOfMines;
+            denominator = numberOfMines + 1;
         }
 
         IRandom random = state.getOrElse(Attribute.RANDOM, new Random(System.currentTimeMillis()));

@@ -4,7 +4,7 @@ import {useCallback, useEffect, useState} from "react";
 import ParameterSelector from "./ParameterSelector.jsx";
 import "./ActionSelector.css"
 
-function ActionSelector({players, uuid, enabled, update, setPositionOptions, selectPositionFunction, clearActionSelectorFunction}) {
+function ActionSelector({uuid, enabled, update, setPositionOptions, selectPositionFunction, selectPlayerForActionFunction, clearActionSelectorFunction}) {
     if (!enabled) {
         return (<></>);
     }
@@ -27,13 +27,20 @@ function ActionSelector({players, uuid, enabled, update, setPositionOptions, sel
     const [error, setError] = useState(DEFAULT_STRING);
 
     useEffect(() => {
+        selectPlayerForActionFunction.current = (player) => {
+            setPlayer(player);
+            setSelectedAction(DEFAULT_SELECTED_ACTION);
+            setChosenActionParameters(DEFAULT_CHOSEN_ACTION_PARAMETERS);
+            setError(DEFAULT_STRING);
+        };
+
         clearActionSelectorFunction.current = () => {
             setPlayer(DEFAULT_STRING);
             setPossibleActions(DEFAULT_POSSIBLE_ACTIONS);
             setSelectedAction(DEFAULT_SELECTED_ACTION);
             setChosenActionParameters(DEFAULT_CHOSEN_ACTION_PARAMETERS);
             setError(DEFAULT_STRING);
-        }
+        };
     }, []);
 
     function getPossibleActions(playerName) {
@@ -72,59 +79,52 @@ function ActionSelector({players, uuid, enabled, update, setPositionOptions, sel
 
     return (
         <div className="selector-container">
-            <div className="player-select select-margin">
-                { players.sort((a, b) => a.$NAME.localeCompare(b.$NAME)).map((playerObject) =>
-                    <div key={playerObject.$NAME} className="select-margin">
-                        <input type="radio" name="player" value={playerObject.$NAME} id={playerObject.$NAME} onClick={() => {
-                            setPlayer(playerObject.$NAME);
-                            setSelectedAction(DEFAULT_SELECTED_ACTION);
-                            setChosenActionParameters(DEFAULT_CHOSEN_ACTION_PARAMETERS);
-                            setError(DEFAULT_STRING);
-                        }} />
-                        <span>{playerObject.$NAME}</span>
-                    </div>
-                )}
-            </div>
-            <div className="action-select select-margin">
-                { possibleActions.possible_actions?.sort((a, b) => a.name.localeCompare(b.name))?.map((action) =>
-                    <div key={action.name} className="select-margin">
-                        <input type="radio"
-                               name="action"
-                               value={action.name}
-                               id={action.name}
-                               disabled={action.error}
-                               onClick={() => {
-                                   setSelectedAction(action);
-                                   setChosenActionParameters(DEFAULT_CHOSEN_ACTION_PARAMETERS);
-                                   setError(DEFAULT_STRING);
-                               }}
+            { player !== DEFAULT_STRING && <div>
+                <h2 className="select-action-text">Select an action for {player}</h2>
+                <button className="close-button" onClick={() => clearActionSelectorFunction.current()}>Close</button>
+            </div> }
+            <div className="selection">
+                <div className="action-select select-margin">
+                    { possibleActions.possible_actions?.sort((a, b) => a.name.localeCompare(b.name))?.map((action) =>
+                        <div key={action.name} className="select-margin">
+                            <input type="radio"
+                                   name="action"
+                                   value={action.name}
+                                   id={action.name}
+                                   disabled={action.error}
+                                   onClick={() => {
+                                       setSelectedAction(action);
+                                       setChosenActionParameters(DEFAULT_CHOSEN_ACTION_PARAMETERS);
+                                       setError(DEFAULT_STRING);
+                                   }}
+                            />
+                            <span>
+                                <label title={action.description} className={`${action.error ? "label-strikethrough" : ""}`}>{`${action.name}`}</label>
+                                { action.error ? <span>{action.error}</span> : <></> }
+                            </span>
+                        </div>
+                    )}
+                </div>
+                <div className="action-parameters select-margin">
+                    { selectedAction.parameters?.map((parameter) => {
+                        let positionsToReport = [];
+                        if (parameter.type === "Position") {
+                            positionsToReport = parameter.values;
+                        }
+                        return <ParameterSelector
+                            parameter={parameter}
+                            callback={(parameter) => {
+                                const newChosenActionParameters = {...chosenActionParameters};
+                                newChosenActionParameters[parameter.name] = parameter;
+                                setChosenActionParameters(newChosenActionParameters);
+                                setError(DEFAULT_STRING);
+                            }}
+                            key={parameter.name}
+                            handlePositionSelection={() => setPositionOptions(positionsToReport)}
+                            selectPositionFunction={selectPositionFunction}
                         />
-                        <span>
-                            <label title={action.description} className={`${action.error ? "label-strikethrough" : ""}`}>{`${action.name}`}</label>
-                            { action.error ? <span>{action.error}</span> : <></> }
-                        </span>
-                    </div>
-                )}
-            </div>
-            <div className="action-parameters select-margin">
-                { selectedAction.parameters?.map((parameter) => {
-                    let positionsToReport = [];
-                    if (parameter.type === "Position") {
-                        positionsToReport = parameter.values;
-                    }
-                    return <ParameterSelector
-                        parameter={parameter}
-                        callback={(parameter) => {
-                            const newChosenActionParameters = {...chosenActionParameters};
-                            newChosenActionParameters[parameter.name] = parameter;
-                            setChosenActionParameters(newChosenActionParameters);
-                            setError(DEFAULT_STRING);
-                        }}
-                        key={parameter.name}
-                        handlePositionSelection={() => setPositionOptions(positionsToReport)}
-                        selectPositionFunction={selectPositionFunction}
-                    />
-                })}
+                    })}
+                </div>
             </div>
             { selectedAction.name === DEFAULT_STRING ? <></> :
                 <button disabled={ (Object.keys(chosenActionParameters).length !== selectedAction.parameters.length) || (error !== DEFAULT_STRING)} onClick={

@@ -13,6 +13,7 @@ const ENGLISH_LOCALE = {
     SPEED: "Speed",
     RANGE: "Range",
     PLAYER_REF: "Player",
+    POSITION: "Position",
     DURABILITY: "Durability",
     DAMAGE_MODIFIER: "Damage Modifier",
     DEFENSE_MODIFIER: "Defense Modifier",

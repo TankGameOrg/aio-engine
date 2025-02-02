@@ -89,7 +89,8 @@ public class DefaultRulesetRegister implements RulesetRegister {
 
     @Override
     public void registerDestroyHandlers(List<Destroy> destroysHandlers) {
-        destroysHandlers.add(new Destroy(new HasZeroDurabilityPredicate().and(new IsTankPredicate()), new DestroyTankHandle(2)));
         destroysHandlers.add(new Destroy(new HasZeroDurabilityPredicate(), new DestroyEntityHandle()));
+        destroysHandlers.add(new Destroy(new HasZeroDurabilityPredicate().and(new IsTankPredicate()), new DestroyTankHandle(2)));
+        destroysHandlers.add(new Destroy(new HasZeroDurabilityPredicate().and(new IsWallPredicate()), new ExpandGoldMineHandle()));
     }
 }
