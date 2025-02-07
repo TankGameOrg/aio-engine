@@ -14,6 +14,12 @@ export default function entryToText(entry) {
             return `${entry.subject.name} repairs unit on ${positionToString(entry.target_position)}`;
         } else if (entry.action === "Upgrade") {
             return `${entry.subject.name} upgrades ${entry.target_boon.variant}`;
+        } else if (entry.action === "Accept Sponsorship") {
+            return `${entry.subject.name} accepts sponsorship from ${entry.target_player.name}`;
+        } else if (entry.action === "Offer Sponsorship") {
+            return `${entry.subject.name} offers sponsorship to ${entry.target_player.name}`;
+        } else if (entry.action === "Bless Patron") {
+            return `${entry.subject.name} blesses ${entry?.target_player?.name}`;
         } else {
             return `${entry.subject.name} takes action: ${entry.action}`;
         }

@@ -29,6 +29,8 @@ public class Attribute<E> {
     public static final Attribute<Integer> DEFENSE_MODIFIER = new Attribute<>("DEFENSE_MODIFIER", Integer.class);
     public static final Attribute<Specialty> SPECIALTY = new Attribute<>("SPECIALTY", Specialty.class);
     public static final Attribute<Boon> BOON = new Attribute<>("BOON", Boon.class);
+    public static final Attribute<PlayerRef> SPONSOR = new Attribute<>("SPONSOR", PlayerRef.class);
+    public static final Attribute<ListEntity> OFFERED_SPONSORS = new Attribute<>("OFFERED_SPONSORS", ListEntity.class); // AttributeList<PlayerRef>
 
     // Durability attributes
     public static final Attribute<Integer> DURABILITY = new Attribute<>("DURABILITY", Integer.class);
@@ -54,7 +56,9 @@ public class Attribute<E> {
     // Player attributes
     public static final Attribute<String> NAME = new Attribute<>("NAME", String.class);
     public static final Attribute<String> TEAM = new Attribute<>("TEAM", String.class);
-    public static final Attribute<Integer> GLORY =  new Attribute<>("GLORY", Integer.class);
+    public static final Attribute<PlayerRef> SPONSORED_PLAYER = new Attribute<>("SPONSORED_PLAYER", PlayerRef.class);
+    public static final Attribute<Boolean> IS_SPONSOR = new Attribute<>("IS_SPONSOR", Boolean.class);
+    public static final Attribute<Boolean> CAN_BLESS = new Attribute<>("CAN_BLESS", Boolean.class);
 
     // Log entry attributes
     public static final Attribute<String> ACTION = new Attribute<>("ACTION", String.class);

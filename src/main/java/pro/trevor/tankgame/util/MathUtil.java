@@ -2,7 +2,7 @@ package pro.trevor.tankgame.util;
 
 import pro.trevor.tankgame.state.State;
 import pro.trevor.tankgame.state.board.Board;
-import pro.trevor.tankgame.state.board.floor.GoldMine;
+import pro.trevor.tankgame.state.board.floor.ScrapHeap;
 
 import java.util.*;
 import java.util.function.Function;
@@ -95,7 +95,7 @@ public class MathUtil {
 
     public static boolean isOrthAdjToMine(State state, Position p) {
         for (Position x : MathUtil.orthogonallyAdjacentPositions(p)) {
-            if (state.getBoard().getFloor(x).orElse(null) instanceof GoldMine) {
+            if (state.getBoard().getFloor(x).orElse(null) instanceof ScrapHeap) {
                 return true;
             }
         }
@@ -103,7 +103,7 @@ public class MathUtil {
     }
 
     public static boolean isMine(State state, Position position) {
-        return state.getBoard().getFloor(position).map((floor) -> floor instanceof GoldMine).orElse(false);
+        return state.getBoard().getFloor(position).map((floor) -> floor instanceof ScrapHeap).orElse(false);
     }
 
     public static void findAllConnectedMines(Set<Position> positions, State state, Position p) {

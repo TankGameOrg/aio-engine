@@ -4,14 +4,14 @@ import org.json.JSONObject;
 import pro.trevor.tankgame.util.Position;
 import pro.trevor.tankgame.util.JsonType;
 
-@JsonType(name = "GoldMine")
-public class GoldMine extends WalkableFloor {
+@JsonType(name = "ScrapHeap")
+public class ScrapHeap extends WalkableFloor {
 
-    public GoldMine(Position position) {
+    public ScrapHeap(Position position) {
         super(position);
     }
 
-    public GoldMine(JSONObject json) {
+    public ScrapHeap(JSONObject json) {
         super(json);
     }
 

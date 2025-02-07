@@ -84,6 +84,9 @@ function Game() {
     }, [updateLogbook]);
 
     const gameIsCurrent = game.logbook.length === activeGame;
+    const allPlayers = state.$PLAYERS.elements.map((player) => player.$NAME).sort((a, b) => a.localeCompare(b));
+    const livingPlayers = state.$BOARD.units.filter((unit) => unit.$PLAYER_REF !== undefined).map((unit) => unit.$PLAYER_REF.name);
+    const councilPlayers = allPlayers.filter((player) => livingPlayers.indexOf(player) < 0);
 
     return (
         <div>
@@ -93,7 +96,7 @@ function Game() {
             <div className="logbook-board-container">
                 <Logbook logbook={game.logbook} activeGame={activeGame} setActiveGame={setActiveGame} />
                 <Board board={state.$BOARD} selectMode={positionOptions.length > 0} gameIsCurrent={gameIsCurrent} positionOptions={positionOptions} selectPosition={selectPositionFunction} clearSelectionMode={() => setPositionOptions([])} selectPlayerForActionFunction={selectPlayerForActionFunction} />
-                <Menu advanceTick={advanceTick} undoAction={undoAction}  />
+                <Menu advanceTick={advanceTick} undoAction={undoAction} players={councilPlayers} setActionPlayer={selectPlayerForActionFunction} />
             </div>
             <ActionSelector
                 enabled={gameIsCurrent}

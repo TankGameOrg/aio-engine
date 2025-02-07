@@ -20,6 +20,7 @@ const ENGLISH_LOCALE = {
     SPECIALTY: "Specialty",
     TEAM: "Team",
     GLORY: "Glory",
+    SPONSOR: "Sponsor",
 };
 
 export function objectToLocalizedObject(locale, object) {

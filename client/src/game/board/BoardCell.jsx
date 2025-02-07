@@ -10,21 +10,23 @@ function BoardCell({unit, floor, gameIsCurrent, selectMode, enabled, onClick, se
     const unitClass = unit?.class;
     const floorClass =  floor?.class;
 
-    let text;
-    let background;
+    let text = "";
+    let background = "";
+    let innerBackground = "";
 
     if (unitClass === undefined) {
         text = "";
     } else if (unitClass === "Tank") {
         text = unit?.$PLAYER_REF?.name;
+        innerBackground = "board-cell-tank";
     } else if (unitClass === "Wall") {
-        text = unit?.$DURABILITY;
+        innerBackground = "board-cell-wall";
     } else {
         text = "Unknown"
     }
 
-    if (floorClass === "GoldMine") {
-        background = "board-cell-background-gold"
+    if (floorClass === "ScrapHeap") {
+        background = "board-cell-background-scrap"
     } else {
         background = "board-cell-background-gray"
     }
@@ -47,7 +49,11 @@ function BoardCell({unit, floor, gameIsCurrent, selectMode, enabled, onClick, se
                 setPopupOpen(true);
             }
         }}>
-            <span className="board-cell-content">{text}</span>
+            <div className={`board-cell-content ${innerBackground}`}>
+                <span className="board-cell-text">
+                    {text}
+                </span>
+            </div>
         </div>
     );
 

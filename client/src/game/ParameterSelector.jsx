@@ -25,25 +25,32 @@ function ParameterSelector({parameter, callback, handlePositionSelection, select
         }
     }
 
+    const presentationToValue = {};
+    parameter.values.forEach((value) => presentationToValue[present(parameter, value)] =  value);
+
+
     if (parameter.bound === "DISCRETE") {
         if (parameter.type === "Position") {
             selector = <button
+                className="position-select-button"
                 onClick={() => handlePositionSelection()}
             >
                 {positionToString(selectedPosition) ?? "Select"}
             </button>;
         } else {
             selector = (
-                <>
-                    {parameter.values.map((value) => {
+                <select className="selector" defaultValue="default" onChange={(event) => {
+                    const presentation = event.target.value;
+                    const value = presentationToValue[presentation];
+                    callback({...parameter, selected: value});
+                }}>
+                    <option value="default" disabled></option>
+                    {parameter.values.map((value, index) => {
                         return (
-                            <div key={value}>
-                                <input type="radio" name={parameter.name} value={value} onClick={() => callback({...parameter, selected: value})} />
-                                <label>{present(parameter, value)}</label>
-                            </div>
+                            <option key={index} value={present(parameter, value)}>{present(parameter, value)}</option>
                         );
                     })}
-                </>
+                </select>
             );
         }
     } else if (parameter.bound === "RANGE") {

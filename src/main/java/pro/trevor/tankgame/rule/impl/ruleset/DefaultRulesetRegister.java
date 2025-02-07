@@ -7,7 +7,6 @@ import pro.trevor.tankgame.rule.action.ActionRule;
 import pro.trevor.tankgame.rule.action.ActionRuleset;
 import pro.trevor.tankgame.rule.action.Description;
 import pro.trevor.tankgame.rule.action.Predicate;
-import pro.trevor.tankgame.rule.action.parameter.DiscreteValueBound;
 import pro.trevor.tankgame.rule.action.parameter.Parameter;
 import pro.trevor.tankgame.rule.apply.ApplyRuleset;
 import pro.trevor.tankgame.rule.apply.TargetApplyRule;
@@ -18,6 +17,9 @@ import pro.trevor.tankgame.rule.impl.action.Move;
 import pro.trevor.tankgame.rule.impl.action.Repair;
 import pro.trevor.tankgame.rule.impl.action.Shoot;
 import pro.trevor.tankgame.rule.impl.action.specialize.Specialize;
+import pro.trevor.tankgame.rule.impl.action.sponsor.AcceptSponsorship;
+import pro.trevor.tankgame.rule.impl.action.sponsor.Bless;
+import pro.trevor.tankgame.rule.impl.action.sponsor.OfferSponsorship;
 import pro.trevor.tankgame.rule.impl.action.upgrade.Upgrade;
 import pro.trevor.tankgame.rule.impl.apply.ModifyAttribute;
 import pro.trevor.tankgame.rule.impl.handle.*;
@@ -37,6 +39,7 @@ public class DefaultRulesetRegister implements RulesetRegister {
 
     @Override
     public void registerPlayerRules(Ruleset ruleset) {
+        // Player with tank rules
         ActionRuleset actionRuleset = ruleset.getPlayerActionRuleset();
         actionRuleset.add(
                 new Description("Mine", "Has a chance to obtain a scrap; the chance is greater if standing on a bigger scrap heap"),
@@ -62,6 +65,23 @@ public class DefaultRulesetRegister implements RulesetRegister {
                 new Description("Upgrade", "Once per game, upgrade an attribute of your tank"),
                 new ActionRule(new Predicate(List.of(new PlayerTankIsPresentPrecondition(), new PlayerTankHasNoBoonPrecondition(), new PlayerTankHasScrapPrecondition(6), new PlayerTankCanActPreondition()), List.of()),
                         new Upgrade(), new Parameter<>("Boon", Attribute.TARGET_BOON, new BoonSupplier()))
+        );
+        actionRuleset.add(
+                new Description("Accept Sponsorship", "Accept the sponsorship of a councilor; they may offer you certain benefits"),
+                new ActionRule(new Predicate(List.of(new PlayerTankIsPresentPrecondition(), new PlayerTankHasNoSponsorPrecondition(), new PlayerTankHasSponsorOfferPrecondition()), List.of()),
+                        new AcceptSponsorship(), new Parameter<>("Player", Attribute.TARGET_PLAYER, new AcceptSponsorshipSupplier()))
+        );
+
+        // Player without tank rules
+        actionRuleset.add(
+                new Description("Offer Sponsorship", "Offer to sponsor a tank; you lose your team alignment but win if the chosen tank wins"),
+                new ActionRule(new Predicate(List.of(new PlayerTankIsAbsentPrecondition(), new CouncilorHasNoPatronPrecondition()), List.of()),
+                        new OfferSponsorship(), new Parameter<>("Player", Attribute.TARGET_PLAYER, new OfferSponsorshipSupplier()))
+        );
+        actionRuleset.add(
+                new Description("Bless Patron", "Bless your patron with an extra action today "),
+                new ActionRule(new Predicate(List.of(new PlayerTankIsAbsentPrecondition(), new CouncilorHasPatronPrecondition(), new CouncilorHasPatronWithTank()), List.of()), new Bless())
+
         );
     }
 
@@ -91,6 +111,6 @@ public class DefaultRulesetRegister implements RulesetRegister {
     public void registerDestroyHandlers(List<Destroy> destroysHandlers) {
         destroysHandlers.add(new Destroy(new HasZeroDurabilityPredicate(), new DestroyEntityHandle()));
         destroysHandlers.add(new Destroy(new HasZeroDurabilityPredicate().and(new IsTankPredicate()), new DestroyTankHandle(2)));
-        destroysHandlers.add(new Destroy(new HasZeroDurabilityPredicate().and(new IsWallPredicate()), new ExpandGoldMineHandle()));
+        destroysHandlers.add(new Destroy(new HasZeroDurabilityPredicate().and(new IsWallPredicate()), new ExpandScrapHeapHandle()));
     }
 }

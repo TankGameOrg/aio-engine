@@ -89,9 +89,14 @@ public class Game {
             return jsonError("Failed conditions check:\n" + conditions.message());
         }
 
-        rule.apply(state, actionEntry);
+        Error error = rule.apply(state, actionEntry);
 
-        return jsonSuccess();
+        if (error == Error.NONE) {
+            return jsonSuccess();
+        } else {
+            return jsonError("Failed to apply:\n" + error.message());
+        }
+
     }
 
     public void tick() {

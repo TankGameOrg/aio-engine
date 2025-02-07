@@ -4,7 +4,7 @@
     vertical-align: top;
     justify-content: center;
     align-items: center;
-    padding: 0;
+    padding: 2px;
     margin: 0;
     border: 1px solid #000;
     width: 64px;
@@ -17,15 +17,14 @@
     display: flex;
     position: relative;
     justify-content: center;
-    align-items: center;
     overflow: hidden;
     margin: 0;
 
     /* 100% - (2 * border + 2 * inset)px */
-    width: calc(100% - 8px);
-    height: calc(100% - 8px);
+    width: calc(100% - 4px);
+    height: calc(100% - 4px);
 
-    inset: 3px;
+    inset: 1px;
     border: 1px solid #000;
 
     font-size: 8px;
@@ -74,8 +73,8 @@
     color: #1a1a1a;
 }
 
-.board-cell-background-gold {
-    background-color: #fc0;
+.board-cell-background-scrap {
+    background-color: #44a;
     color: #1a1a1a;
 }
 
@@ -109,4 +108,18 @@
 .popup-body {
     text-align: left;
     font-size: 16px;
+}
+
+.board-cell-text {
+    margin-top: 4px;
+    font-size: 12px;
+    overflow: hidden;
+}
+
+.board-cell-wall {
+    background-image: url("assets/images/Wall.png");
+}
+
+.board-cell-tank {
+    background-image: url("assets/images/Tank.png");
 }

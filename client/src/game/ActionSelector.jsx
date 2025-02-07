@@ -85,7 +85,7 @@ function ActionSelector({uuid, enabled, update, setPositionOptions, selectPositi
             </div> }
             <div className="selection">
                 <div className="action-select select-margin">
-                    { possibleActions.possible_actions?.sort((a, b) => a.name.localeCompare(b.name))?.map((action) =>
+                    { (player !== DEFAULT_STRING && possibleActions.possible_actions.length === 0) ? <span>You have no available actions</span> : possibleActions.possible_actions?.sort((a, b) => a.name.localeCompare(b.name))?.map((action) =>
                         <div key={action.name} className="select-margin">
                             <input type="radio"
                                    name="action"

@@ -27,6 +27,10 @@
     margin-top: 10px;
 }
 
+.position-select-button {
+    display: flex;
+}
+
 .close-button {
     float: right;
 }

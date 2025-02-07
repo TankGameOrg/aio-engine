@@ -29,7 +29,12 @@ public class DestroyTankHandle implements DestroyHandle {
         if (cause instanceof TankCause tankCause && !tankCause.getCause().equals(target)) {
             Tank causeTank = tankCause.getCause();
             Player player = causeTank.getPlayerRef().toPlayer(state).get();
-            player.put(Attribute.GLORY, player.getOrElse(Attribute.GLORY, 0) + 1);
+
+            int previousScrap = player.getOrElse(Attribute.SCRAP, 0);
+            int tankScrap = tank.getOrElse(Attribute.SCRAP, 0);
+            int tankHasSponsorScrap = tank.has(Attribute.SPONSOR) ? 2 : 0;
+
+            player.put(Attribute.SCRAP,  previousScrap + tankScrap + tankHasSponsorScrap);
         }
 
         Position targetPosition = tank.getPosition();
