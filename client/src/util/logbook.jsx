@@ -1,7 +1,15 @@
 import {positionToString} from "./position.js";
 
+function subEntryToText(subentry) {
+    if (subentry?.fallen_action) {
+        return `Fallen ${subentry.fallen_action.variant.toLowerCase()}s ${positionToString(subentry.target_position)}`;
+    } else {
+        return "Could not resolve subentry";
+    }
+}
+
 export default function entryToText(entry) {
-    if (entry?.subject?.name && entry.action) {
+    if (entry?.subject?.name && entry?.action) {
         if (entry.action === "Shoot") {
             return `${entry.subject.name} shoots at ${positionToString(entry.target_position)} ${entry.dice_roll !== undefined ? `(${entry.dice_roll}${entry.total_damage === entry.dice_roll ? "" : `; ${entry.total_damage} total`} damage)` : ""}`;
         } else if (entry.action === "Move") {
@@ -20,11 +28,33 @@ export default function entryToText(entry) {
             return `${entry.subject.name} offers sponsorship to ${entry.target_player.name}`;
         } else if (entry.action === "Bless Patron") {
             return `${entry.subject.name} blesses ${entry?.target_player?.name}`;
+        } else if (entry.action === "Fallen Move") {
+            return `${entry.subject.name} compels the fallen to move to ${positionToString(entry?.target_position)}`;
+        } else if (entry.action === "Fallen Shoot") {
+            return `${entry.subject.name} compels the fallen to shoot at ${positionToString(entry?.target_position)}`;
+        } else if (entry.action === "Fallen Remain") {
+            return `${entry.subject.name} compels the fallen to remain`;
         } else {
             return `${entry.subject.name} takes action: ${entry.action}`;
         }
     } else if (entry?.tick) {
-        return `Start of day ${entry.tick}`;
+        let text =  `Start of day ${entry.tick}`;
+        const subentries = entry?.subentries?.elements;
+        if (subentries !== undefined && subentries !== 0) {
+            return (
+                <>
+                    <span>{text}</span>
+                    { subentries.map((entry, index) =>
+                        <>
+                            <br/>
+                            <span id={`${index}`}>{subEntryToText(entry)}</span>
+                        </>
+                    )}
+                </>
+            );
+        }
+        return <span>{text}</span>;
+
     } else {
         return "Unknown entry localization";
     }

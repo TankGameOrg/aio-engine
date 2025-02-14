@@ -25,7 +25,6 @@ public class State extends AttributeEntity implements IJsonObject {
         put(Attribute.TICK, 0);
         put(Attribute.RUNNING, true);
         put(Attribute.WINNER, "");
-
         put(Attribute.PLAYERS, players);
     }
 

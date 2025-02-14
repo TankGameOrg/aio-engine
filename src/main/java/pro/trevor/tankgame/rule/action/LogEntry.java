@@ -6,8 +6,11 @@ import org.json.JSONObject;
 
 import pro.trevor.tankgame.attribute.Attribute;
 import pro.trevor.tankgame.attribute.AttributeEntity;
+import pro.trevor.tankgame.util.IJsonObject;
+import pro.trevor.tankgame.util.JsonType;
 
-public class LogEntry extends AttributeEntity {
+@JsonType(name = "LogEntry")
+public class LogEntry extends AttributeEntity implements IJsonObject {
     public LogEntry() {
         super();
     }

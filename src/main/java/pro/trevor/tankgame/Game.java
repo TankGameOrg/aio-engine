@@ -47,8 +47,18 @@ public class Game {
 
     public JSONObject ingestEntry(LogEntry entry) {
         if (entry.get(Attribute.TICK).isPresent()) {
-            tick();
-            return jsonSuccess();
+            List<LogEntry> entries = tick();
+            JSONObject result = new JSONObject();
+            result.put("error", false);
+            result.put("message", "entries");
+
+            JSONArray jsonArray = new JSONArray();
+            for (LogEntry e : entries) {
+                jsonArray.put(e.toJson());
+            }
+            result.put("entries", jsonArray);
+
+            return result;
         } else if (entry.has(Attribute.ACTION) && entry.has(Attribute.SUBJECT)) {
             return ingestPlayerAction(entry);
         }
@@ -99,12 +109,14 @@ public class Game {
 
     }
 
-    public void tick() {
+    public List<LogEntry> tick() {
+        List<LogEntry> entries = new ArrayList<>();
         ruleset.getTickRuleset().stream().forEach((tickRule) -> {
-            tickRule.apply(state);
+            tickRule.apply(state).map(entries::add);
             enforceInvariants();
         });
         state.put(Attribute.TICK, state.getOrElse(Attribute.TICK, 0) + 1);
+        return entries;
     }
 
     public void checkConditions() {

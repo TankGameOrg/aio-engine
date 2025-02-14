@@ -19,10 +19,7 @@ import pro.trevor.tankgame.util.Position;
 import java.io.File;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @RestController
 public class Server {
@@ -62,7 +59,7 @@ public class Server {
         GameInfo gameInfo = storage.getGameInfoByUUID(uuid);
         List<LogEntry> logbook = storage.getLogbookByUUID(uuid);
 
-        if (gameInfo == null) {
+        if (gameInfo == null || logbook == null) {
             return error(new JSONObject().put("message", "Invalid game UUID"));
         }
 
@@ -154,6 +151,13 @@ public class Server {
         LogEntry logEntry = new LogEntry(Map.of(Attribute.TICK, gameInfo.game().getState().getOrElse(Attribute.TICK, 0) + 1));
         JSONObject output = gameInfo.game().ingestEntry(logEntry);
         if (!output.getBoolean("error")) {
+            JSONArray entries = output.getJSONArray("entries");
+            ListEntity<LogEntry> subEntries = new ListEntity<>();
+            for (int i = 0; i < entries.length(); ++i) {
+                LogEntry entry = new LogEntry(entries.getJSONObject(i));
+                subEntries.add(entry);
+            }
+            logEntry.put(Attribute.SUBENTRIES, subEntries);
             storage.saveGameAfterAction(gameInfo, logEntry);
         }
 

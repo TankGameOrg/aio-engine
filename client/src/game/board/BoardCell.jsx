@@ -17,7 +17,10 @@ function BoardCell({unit, floor, gameIsCurrent, selectMode, enabled, onClick, se
     if (unitClass === undefined) {
         text = "";
     } else if (unitClass === "Tank") {
-        text = unit?.$PLAYER_REF?.name;
+        text = unit?.$PLAYER_REF?.name ?? "???";
+        innerBackground = "board-cell-tank";
+    } else if (unitClass === "PseudoTank") {
+        text = "Fallen";
         innerBackground = "board-cell-tank";
     } else if (unitClass === "Wall") {
         innerBackground = "board-cell-wall";
@@ -63,8 +66,14 @@ function BoardCell({unit, floor, gameIsCurrent, selectMode, enabled, onClick, se
 
 
     let unitAttributes = [];
-    if (unit.class) {
+    let unitClassText = "Empty";
+    if (unitClass) {
         unitAttributes = objectToArray(objectToLocalizedObject(ENGLISH_LOCALE, unit));
+        if (unitClass === "PseudoTank") {
+            unitClassText = "Fallen";
+        } else if (unitClass === "Tank") {
+            unitClassText = `Tank (${unit?.$PLAYER_REF?.name ?? "Unknown Player"})`;
+        }
     }
 
     return (
@@ -73,7 +82,7 @@ function BoardCell({unit, floor, gameIsCurrent, selectMode, enabled, onClick, se
             <Popup position="bottom center"  open={popupOpen} arrow={false} closeOnDocumentClick={true} onClose={() => setPopupOpen(false)}>
                 <div className="popup-overlay" />
                 <div className="popup-container">
-                    <span className="popup-title">{unit?.class ?? "Empty"}</span>
+                    <span className="popup-title">{unitClassText}</span>
                     { unitAttributes.map((pair) => <span key={pair.key}>{`${pair.key}: ${codeObjectToString(pair.value)}`}</span>) }
                     {floor?.class ? <span className="popup-title">{floor.class}</span> : <></>}
                     { (unit?.$PLAYER_REF && gameIsCurrent) ? <button onClick={() => {

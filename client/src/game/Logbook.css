@@ -2,13 +2,16 @@
     margin: 0;
     min-width: 360px;
     padding: 0 16px 0 0;
+    height: inherit;
+    max-height: 50%;
 }
 
 .logbook {
     margin: 0;
     padding: 0;
     border: solid 2px #aaa;
-    height: 100%;
+    height: inherit;
+    max-height: 50vh;
     overflow-y: auto;
 }
 

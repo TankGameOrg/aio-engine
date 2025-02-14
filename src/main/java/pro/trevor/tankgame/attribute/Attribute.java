@@ -1,5 +1,6 @@
 package pro.trevor.tankgame.attribute;
 
+import pro.trevor.tankgame.rule.impl.action.fallen.ActionType;
 import pro.trevor.tankgame.rule.impl.action.specialize.Specialty;
 import pro.trevor.tankgame.rule.impl.action.upgrade.Boon;
 import pro.trevor.tankgame.state.board.Board;
@@ -30,7 +31,10 @@ public class Attribute<E> {
     public static final Attribute<Specialty> SPECIALTY = new Attribute<>("SPECIALTY", Specialty.class);
     public static final Attribute<Boon> BOON = new Attribute<>("BOON", Boon.class);
     public static final Attribute<PlayerRef> SPONSOR = new Attribute<>("SPONSOR", PlayerRef.class);
-    public static final Attribute<ListEntity> OFFERED_SPONSORS = new Attribute<>("OFFERED_SPONSORS", ListEntity.class); // AttributeList<PlayerRef>
+    public static final Attribute<ListEntity> OFFERED_SPONSORS = new Attribute<>("OFFERED_SPONSORS", ListEntity.class); // ListEntity<PlayerRef>
+
+    //  PseudoTank attributes
+    public static final Attribute<ListEntity> ACTION_OPTIONS = new Attribute<>("ACTION_OPTIONS", ListEntity.class); // ListEntity<LogEntry>
 
     // Durability attributes
     public static final Attribute<Integer> DURABILITY = new Attribute<>("DURABILITY", Integer.class);
@@ -45,13 +49,13 @@ public class Attribute<E> {
     public static final Attribute<Integer> TICK = new Attribute<>("TICK", Integer.class);
     public static final Attribute<Boolean> RUNNING = new Attribute<>("RUNNING", Boolean.class);
     public static final Attribute<String> WINNER = new Attribute<>("WINNER", String.class);
-    public static final Attribute<ListEntity> PLAYERS = new Attribute<>("PLAYERS", ListEntity.class); // AttributeList<Player>
+    public static final Attribute<ListEntity> PLAYERS = new Attribute<>("PLAYERS", ListEntity.class); // ListEntity<Player>
     public static final Attribute<Council> COUNCIL = new Attribute<>("COUNCIL", Council.class);
     public static final Attribute<Board> BOARD = new Attribute<>("BOARD", Board.class);
     public static final Attribute<IRandom> RANDOM = new Attribute<>("RANDOM", IRandom.class);
 
     // Council attributes
-    public static final Attribute<ListEntity> COUNCILLORS = new Attribute<>("COUNCILLORS", ListEntity.class); // AttributeList<Player>
+    public static final Attribute<ListEntity> COUNCILLORS = new Attribute<>("COUNCILLORS", ListEntity.class); // ListEntity<Player>
 
     // Player attributes
     public static final Attribute<String> NAME = new Attribute<>("NAME", String.class);
@@ -59,8 +63,10 @@ public class Attribute<E> {
     public static final Attribute<PlayerRef> SPONSORED_PLAYER = new Attribute<>("SPONSORED_PLAYER", PlayerRef.class);
     public static final Attribute<Boolean> IS_SPONSOR = new Attribute<>("IS_SPONSOR", Boolean.class);
     public static final Attribute<Boolean> CAN_BLESS = new Attribute<>("CAN_BLESS", Boolean.class);
+    public static final Attribute<Boolean> HAS_COMPELLED_FALLEN = new Attribute<>("HAS_COMPELLED_FALLEN", Boolean.class);
 
     // Log entry attributes
+    public static final Attribute<ListEntity> SUBENTRIES = new Attribute<>("SUBENTRIES", ListEntity.class); // ListEntity<LogEntry>
     public static final Attribute<String> ACTION = new Attribute<>("ACTION", String.class);
     public static final Attribute<PlayerRef> SUBJECT = new Attribute<>("SUBJECT", PlayerRef.class);
     public static final Attribute<Position> TARGET_POSITION = new Attribute<>("TARGET_POSITION", Position.class);
@@ -69,6 +75,7 @@ public class Attribute<E> {
     public static final Attribute<Boon> TARGET_BOON = new Attribute<>("TARGET_BOON", Boon.class);
     public static final Attribute<Integer> DICE_ROLL = new Attribute<>("DICE_ROLL", Integer.class);
     public static final Attribute<Integer> TOTAL_DAMAGE = new Attribute<>("TOTAL_DAMAGE", Integer.class);
+    public static final Attribute<ActionType> FALLEN_ACTION = new Attribute<>("FALLEN_ACTION", ActionType.class);
 
     // Random number generation attributes
     public static final Attribute<Long> RNG_SEED = new Attribute<>("RNG_SEED", Long.class);

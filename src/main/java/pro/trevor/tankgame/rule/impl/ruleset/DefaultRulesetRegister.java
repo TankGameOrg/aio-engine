@@ -8,6 +8,7 @@ import pro.trevor.tankgame.rule.action.ActionRuleset;
 import pro.trevor.tankgame.rule.action.Description;
 import pro.trevor.tankgame.rule.action.Predicate;
 import pro.trevor.tankgame.rule.action.parameter.Parameter;
+import pro.trevor.tankgame.rule.apply.ApplyRule;
 import pro.trevor.tankgame.rule.apply.ApplyRuleset;
 import pro.trevor.tankgame.rule.apply.TargetApplyRule;
 import pro.trevor.tankgame.rule.handle.Damage;
@@ -16,16 +17,23 @@ import pro.trevor.tankgame.rule.impl.action.Mine;
 import pro.trevor.tankgame.rule.impl.action.Move;
 import pro.trevor.tankgame.rule.impl.action.Repair;
 import pro.trevor.tankgame.rule.impl.action.Shoot;
+import pro.trevor.tankgame.rule.impl.action.fallen.MoveFallen;
+import pro.trevor.tankgame.rule.impl.action.fallen.RemainFallen;
+import pro.trevor.tankgame.rule.impl.action.fallen.ShootFallen;
 import pro.trevor.tankgame.rule.impl.action.specialize.Specialize;
 import pro.trevor.tankgame.rule.impl.action.sponsor.AcceptSponsorship;
 import pro.trevor.tankgame.rule.impl.action.sponsor.Bless;
 import pro.trevor.tankgame.rule.impl.action.sponsor.OfferSponsorship;
 import pro.trevor.tankgame.rule.impl.action.upgrade.Upgrade;
+import pro.trevor.tankgame.rule.impl.apply.ApplyRandomActionOption;
 import pro.trevor.tankgame.rule.impl.apply.ModifyAttribute;
 import pro.trevor.tankgame.rule.impl.handle.*;
 import pro.trevor.tankgame.rule.impl.parameter.*;
+import pro.trevor.tankgame.rule.impl.parameter.fallen.FallenMovePositionSupplier;
+import pro.trevor.tankgame.rule.impl.parameter.fallen.FallenShootPositionSupplier;
 import pro.trevor.tankgame.rule.impl.predicate.*;
 import pro.trevor.tankgame.state.board.unit.Tank;
+import pro.trevor.tankgame.state.meta.Player;
 import pro.trevor.tankgame.util.LineOfSight;
 
 import java.util.List;
@@ -79,16 +87,31 @@ public class DefaultRulesetRegister implements RulesetRegister {
                         new OfferSponsorship(), new Parameter<>("Player", Attribute.TARGET_PLAYER, new OfferSponsorshipSupplier()))
         );
         actionRuleset.add(
-                new Description("Bless Patron", "Bless your patron with an extra action today "),
-                new ActionRule(new Predicate(List.of(new PlayerTankIsAbsentPrecondition(), new CouncilorHasPatronPrecondition(), new CouncilorHasPatronWithTank()), List.of()), new Bless())
-
+                new Description("Bless Patron", "Bless your patron with an extra action today"),
+                new ActionRule(new Predicate(List.of(new PlayerTankIsAbsentPrecondition(), new CouncilorHasPatronPrecondition(), new CouncilorHasPatronWithTankPrecondition()), List.of()), new Bless())
+        );
+        actionRuleset.add(
+                new Description("Fallen Shoot", "Compel the fallen tank to shoot at a position"),
+                new ActionRule(new Predicate(List.of(new FallenExistsPrecondition(), new PlayerTankIsAbsentPrecondition(), new CouncilorHasNoPatronPrecondition(), new CouncilorCanCompelFallenPrecondition()), List.of()), new ShootFallen(),
+                        new Parameter<>("Target", Attribute.TARGET_POSITION, new FallenShootPositionSupplier(LineOfSight::hasLineOfSight)))
+        );
+        actionRuleset.add(
+                new Description("Fallen Move", "Compel the fallen to move to a new position"),
+                new ActionRule(new Predicate(List.of(new FallenExistsPrecondition(), new PlayerTankIsAbsentPrecondition(), new CouncilorHasNoPatronPrecondition(), new CouncilorCanCompelFallenPrecondition()), List.of()), new MoveFallen(),
+                        new Parameter<>("Target", Attribute.TARGET_POSITION, new FallenMovePositionSupplier()))
+        );
+        actionRuleset.add(
+                new Description("Fallen Remain", "Compel the fallen to do nothing"),
+                new ActionRule(new Predicate(List.of(new FallenExistsPrecondition(), new PlayerTankIsAbsentPrecondition(), new CouncilorHasNoPatronPrecondition(), new CouncilorCanCompelFallenPrecondition()), List.of()), new RemainFallen())
         );
     }
 
     @Override
     public void registerTickRules(Ruleset ruleset) {
         ApplyRuleset tickRuleset = ruleset.getTickRuleset();
+        tickRuleset.add(new ApplyRule(new ApplyRandomActionOption(ruleset)));
         tickRuleset.add(new TargetApplyRule<>(new ModifyAttribute<>(Attribute.CAN_ACT, ((state, target) -> true)), Tank.class));
+        tickRuleset.add(new TargetApplyRule<>(new ModifyAttribute<>(Attribute.HAS_COMPELLED_FALLEN, ((state, target) -> false)), Player.class));
     }
 
     @Override
@@ -104,6 +127,7 @@ public class DefaultRulesetRegister implements RulesetRegister {
     @Override
     public void registerDamageHandlers(List<Damage> damageHandlers) {
         damageHandlers.add(new Damage(new HasDurabilityPredicate().and(new IsTankPredicate()), new DamageDurabilityHandle(new int[]{1, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 6})));
+        damageHandlers.add(new Damage(new HasDurabilityPredicate().and(new IsPseudoTankPredicate()), new DamageDurabilityHandle(new int[]{1, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 6})));
         damageHandlers.add(new Damage(new HasDurabilityPredicate(), new DamageDurabilityHandle()));
     }
 
@@ -111,6 +135,7 @@ public class DefaultRulesetRegister implements RulesetRegister {
     public void registerDestroyHandlers(List<Destroy> destroysHandlers) {
         destroysHandlers.add(new Destroy(new HasZeroDurabilityPredicate(), new DestroyEntityHandle()));
         destroysHandlers.add(new Destroy(new HasZeroDurabilityPredicate().and(new IsTankPredicate()), new DestroyTankHandle(2)));
+        destroysHandlers.add(new Destroy(new HasZeroDurabilityPredicate().and(new IsPseudoTankPredicate()), new DestroyTankHandle(2)));
         destroysHandlers.add(new Destroy(new HasZeroDurabilityPredicate().and(new IsWallPredicate()), new ExpandScrapHeapHandle()));
     }
 }

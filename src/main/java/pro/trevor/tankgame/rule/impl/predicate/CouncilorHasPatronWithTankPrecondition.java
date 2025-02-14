@@ -9,7 +9,7 @@ import pro.trevor.tankgame.state.meta.PlayerRef;
 
 import java.util.Optional;
 
-public class CouncilorHasPatronWithTank implements Precondition {
+public class CouncilorHasPatronWithTankPrecondition implements Precondition {
     @Override
     public Error test(State state, Player player) {
         if (!player.getOrElse(Attribute.IS_SPONSOR, false)) {

@@ -12,7 +12,6 @@ const ENGLISH_LOCALE = {
     SCRAP: "Scrap",
     SPEED: "Speed",
     RANGE: "Range",
-    PLAYER_REF: "Player",
     POSITION: "Position",
     DURABILITY: "Durability",
     DAMAGE_MODIFIER: "Damage Modifier",

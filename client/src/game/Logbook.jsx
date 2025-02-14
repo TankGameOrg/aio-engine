@@ -1,5 +1,5 @@
 import "./Logbook.css"
-import entryToText from "../util/logbook.js";
+import entryToText from "../util/logbook.jsx";
 
 function Logbook({logbook, activeGame, setActiveGame}) {
 
