@@ -117,11 +117,3 @@
     font-size: 12px;
     overflow: hidden;
 }
-
-.board-cell-wall {
-    background-image: url("assets/images/Wall.png");
-}
-
-.board-cell-tank {
-    background-image: url("assets/images/Tank.png");
-}

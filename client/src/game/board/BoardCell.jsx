@@ -2,6 +2,8 @@ import "./BoardCell.css"
 import Popup from "reactjs-popup";
 import {codeObjectToString, ENGLISH_LOCALE, objectToArray, objectToLocalizedObject} from "../../util/locale.js";
 import {useState} from "react";
+import Tank from "../../../assets/images/Tank.png"
+import Wall from "../../../assets/images/Wall.png"
 
 function BoardCell({unit, floor, gameIsCurrent, selectMode, enabled, onClick, selectPlayer}) {
 
@@ -12,18 +14,18 @@ function BoardCell({unit, floor, gameIsCurrent, selectMode, enabled, onClick, se
 
     let text = "";
     let background = "";
-    let innerBackground = "";
+    let innerBackgroundUrl = "";
 
     if (unitClass === undefined) {
         text = "";
     } else if (unitClass === "Tank") {
         text = unit?.$PLAYER_REF?.name ?? "???";
-        innerBackground = "board-cell-tank";
+        innerBackgroundUrl = `url(${Tank})`;
     } else if (unitClass === "PseudoTank") {
         text = "Fallen";
-        innerBackground = "board-cell-tank";
+        innerBackgroundUrl = `url(${Tank})`;
     } else if (unitClass === "Wall") {
-        innerBackground = "board-cell-wall";
+        innerBackgroundUrl = `url(${Wall})`;
     } else {
         text = "Unknown"
     }
@@ -52,7 +54,7 @@ function BoardCell({unit, floor, gameIsCurrent, selectMode, enabled, onClick, se
                 setPopupOpen(true);
             }
         }}>
-            <div className={`board-cell-content ${innerBackground}`}>
+            <div className={"board-cell-content"} style={{backgroundImage: innerBackgroundUrl}}>
                 <span className="board-cell-text">
                     {text}
                 </span>
