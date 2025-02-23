@@ -2,7 +2,16 @@ import {positionToString} from "./position.js";
 
 function subEntryToText(subentry) {
     if (subentry?.fallen_action) {
-        return `Fallen ${subentry.fallen_action.variant.toLowerCase()}s ${positionToString(subentry.target_position)}`;
+        const variant = subentry.fallen_action.variant;
+        if (variant === "MOVE") {
+            return `Fallen moves to ${positionToString(subentry.target_position)}`;
+        } else if (variant === "SHOOT") {
+            return `Fallen shoots at ${positionToString(subentry.target_position)}`;
+        } else if (variant === "REMAIN") {
+            return "Fallen remains";
+        } else {
+            return `Fallen takes action: ${variant}`
+        }
     } else {
         return "Could not resolve subentry";
     }

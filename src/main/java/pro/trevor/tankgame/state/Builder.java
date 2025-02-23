@@ -73,6 +73,7 @@ public class Builder {
         for (int i = 0; i < tanks.size(); i++) {
             Tank tank = tanks.get(i);
             Player player = players.get(i);
+            player.put(Attribute.TEAM, tank.getUnsafe(Attribute.TEAM));
             tank.put(Attribute.PLAYER_REF, player.toRef());
         }
         return new State(board, new Council(), players);

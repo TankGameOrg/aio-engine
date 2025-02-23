@@ -156,20 +156,6 @@ public class Storage {
         }
     }
 
-    public void saveInitialState(GameInfo gameInfo) {
-        games.put(gameInfo.uuid(), gameInfo);
-        logbooks.put(gameInfo.uuid(), new ArrayList<>());
-
-        File gameDirectory = gameDirectory(gameInfo.uuid());
-        if (!gameDirectory.exists()) {
-            initializeGameDirectory(gameInfo.uuid());
-        }
-
-        saveStateToHistory(gameInfo);
-        saveGameInfo(gameInfo);
-        saveLogbook(gameInfo);
-    }
-
     public void saveGameAfterAction(GameInfo gameInfo, LogEntry logEntry) {
         games.put(gameInfo.uuid(), gameInfo);
         logbooks.get(gameInfo.uuid()).add(logEntry);
@@ -224,14 +210,6 @@ public class Storage {
         return files.length;
     }
 
-    public LogEntry getGameLogEntry(UUID uuid, int index) {
-        return logbooks.get(uuid).get(index);
-    }
-
-    public int getGameLogbookSize(UUID uuid) {
-        return logbooks.get(uuid).size();
-    }
-
     public List<GameInfo> getAllGames() {
         return new ArrayList<>(games.values());
     }
@@ -242,6 +220,21 @@ public class Storage {
 
     public List<LogEntry> getLogbookByUUID(UUID uuid) {
         return logbooks.get(uuid);
+    }
+
+    public Optional<String> getRulesByUUID(UUID uuid) {
+        File gameDirectory = gameDirectory(uuid);
+        File rulesFile = new File(gameDirectory, "rules.md");
+        if (!rulesFile.exists() || !rulesFile.isFile() || !rulesFile.canRead()) {
+            return Optional.empty();
+        }
+
+        String content = Util.readFileToString(rulesFile);
+        if (content == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(content);
     }
 
     public boolean undoAction(UUID uuid) {

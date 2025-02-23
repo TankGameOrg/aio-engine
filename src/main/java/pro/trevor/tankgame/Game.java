@@ -46,6 +46,10 @@ public class Game {
     }
 
     public JSONObject ingestEntry(LogEntry entry) {
+        if (!state.getOrElse(Attribute.RUNNING, true)) {
+            return jsonError("The game is not currently running");
+        }
+
         if (entry.get(Attribute.TICK).isPresent()) {
             List<LogEntry> entries = tick();
             JSONObject result = new JSONObject();
@@ -102,6 +106,7 @@ public class Game {
         Error error = rule.apply(state, actionEntry);
 
         if (error == Error.NONE) {
+            checkConditions();
             return jsonSuccess();
         } else {
             return jsonError("Failed to apply:\n" + error.message());
@@ -115,6 +120,7 @@ public class Game {
             tickRule.apply(state).map(entries::add);
             enforceInvariants();
         });
+        checkConditions();
         state.put(Attribute.TICK, state.getOrElse(Attribute.TICK, 0) + 1);
         return entries;
     }

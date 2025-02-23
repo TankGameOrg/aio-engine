@@ -2,6 +2,7 @@ package pro.trevor.tankgame.web.server;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 import org.springframework.web.bind.annotation.*;
 import pro.trevor.tankgame.Game;
 import pro.trevor.tankgame.attribute.Attribute;
@@ -104,6 +105,11 @@ public class Server {
 
         if (gameInfo == null) {
             return error(new JSONObject().put("message", "Invalid game UUID"));
+        }
+
+        Optional<String> result = ensureWithinOpenHours(uuid);
+        if (result.isPresent()) {
+            return result.get();
         }
 
         LogEntry logEntry = new LogEntry(new JSONObject(requestBody));
@@ -225,6 +231,54 @@ public class Server {
         }
 
         return storage.readStateFromHistory(uuid, id).toJson().toString();
+    }
+
+    @GetMapping("/game/{uuid}/open-hours")
+    public String getGameOpenHours(@PathVariable(name = "uuid") String uuidString) {
+        if (!Util.isUUID(uuidString)) {
+            return error(new JSONObject().put("message", "Invalid game UUID"));
+        }
+
+        UUID uuid = UUID.fromString(uuidString);
+        GameInfo gameInfo = storage.getGameInfoByUUID(uuid);
+
+        if (gameInfo == null) {
+            return error(new JSONObject().put("message", "Invalid game UUID"));
+        }
+
+        return gameInfo.openHours().toJson().toString();
+    }
+
+    @GetMapping("/game/{uuid}/rules")
+    public String getGameRules(@PathVariable(name = "uuid") String uuidString) {
+        if (!Util.isUUID(uuidString)) {
+            return error(new JSONObject().put("message", "Invalid game UUID"));
+        }
+
+        UUID uuid = UUID.fromString(uuidString);
+        GameInfo gameInfo = storage.getGameInfoByUUID(uuid);
+
+        if (gameInfo == null) {
+            return error(new JSONObject().put("message", "Invalid game UUID"));
+        }
+
+        Optional<String> maybeRules = storage.getRulesByUUID(uuid);
+        if (maybeRules.isEmpty()) {
+            return success(new JSONObject().put("message", "Rules not present"));
+        } else {
+            return success(new JSONObject().put("rules", maybeRules.get()));
+        }
+    }
+
+    public Optional<String> ensureWithinOpenHours(UUID uuid) {
+        GameInfo gameInfo = storage.getGameInfoByUUID(uuid);
+        if (gameInfo == null) {
+            return Optional.of(error(new JSONObject().put("message", "Invalid game UUID")));
+        }
+        if (!gameInfo.openHours().isOpen(Calendar.getInstance())) {
+            return Optional.of(error(new JSONObject().put("message", "Submitted outside of open hours")));
+        }
+        return Optional.empty();
     }
 
     public static String success(JSONObject data) {

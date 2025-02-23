@@ -27,6 +27,7 @@ import pro.trevor.tankgame.rule.impl.action.sponsor.OfferSponsorship;
 import pro.trevor.tankgame.rule.impl.action.upgrade.Upgrade;
 import pro.trevor.tankgame.rule.impl.apply.ApplyRandomActionOption;
 import pro.trevor.tankgame.rule.impl.apply.ModifyAttribute;
+import pro.trevor.tankgame.rule.impl.apply.LastTeamStandingCheck;
 import pro.trevor.tankgame.rule.impl.handle.*;
 import pro.trevor.tankgame.rule.impl.parameter.*;
 import pro.trevor.tankgame.rule.impl.parameter.fallen.FallenMovePositionSupplier;
@@ -65,12 +66,12 @@ public class DefaultRulesetRegister implements RulesetRegister {
                 new ActionRule(new Predicate(List.of(new PlayerTankIsPresentPrecondition(), new PlayerTankHasScrapPrecondition(2), new PlayerTankCanActPreondition()), List.of()),
                         new Repair(2, 2), new Parameter<>("Target", Attribute.TARGET_POSITION, new RepairPositionSupplier())));
         actionRuleset.add(
-                new Description("Specialize", "Sped four scrap to hone your tank to a specialized style of combat"),
+                new Description("Specialize", "Spend four scrap to hone your tank to a specialized style of combat"),
                 new ActionRule(new Predicate(List.of(new PlayerTankIsPresentPrecondition(), new PlayerTankHasScrapPrecondition(4), new PlayerTankCanActPreondition()), List.of()),
                         new Specialize(4), new Parameter<>("Specialty", Attribute.TARGET_SPECIALTY, new SpecialtySupplier()))
         );
         actionRuleset.add(
-                new Description("Upgrade", "Once per game, upgrade an attribute of your tank"),
+                new Description("Upgrade", "Once per game, spend six scrap to upgrade an attribute of your tank"),
                 new ActionRule(new Predicate(List.of(new PlayerTankIsPresentPrecondition(), new PlayerTankHasNoBoonPrecondition(), new PlayerTankHasScrapPrecondition(6), new PlayerTankCanActPreondition()), List.of()),
                         new Upgrade(), new Parameter<>("Boon", Attribute.TARGET_BOON, new BoonSupplier()))
         );
@@ -88,7 +89,7 @@ public class DefaultRulesetRegister implements RulesetRegister {
         );
         actionRuleset.add(
                 new Description("Bless Patron", "Bless your patron with an extra action today"),
-                new ActionRule(new Predicate(List.of(new PlayerTankIsAbsentPrecondition(), new CouncilorHasPatronPrecondition(), new CouncilorHasPatronWithTankPrecondition()), List.of()), new Bless())
+                new ActionRule(new Predicate(List.of(new PlayerTankIsAbsentPrecondition(), new CouncilorHasPatronPrecondition(), new CouncilorHasPatronWithTankPrecondition(), new CouncilorCanBlessPrecondition()), List.of()), new Bless())
         );
         actionRuleset.add(
                 new Description("Fallen Shoot", "Compel the fallen tank to shoot at a position"),
@@ -116,7 +117,8 @@ public class DefaultRulesetRegister implements RulesetRegister {
 
     @Override
     public void registerConditionalRules(Ruleset ruleset) {
-        ApplyRuleset tickRuleset = ruleset.getTickRuleset();
+        ApplyRuleset conditionalRuleset = ruleset.getConditionalRuleset();
+        conditionalRuleset.add(new ApplyRule(new LastTeamStandingCheck()));
     }
 
     @Override

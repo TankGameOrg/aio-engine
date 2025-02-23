@@ -6,6 +6,14 @@ function fetchGame(url, uuid) {
     return fetch(`${url}/game/${uuid}`, {});
 }
 
+function fetchOpenHours(url, uuid) {
+    return fetch(`${url}/game/${uuid}/open-hours`, {});
+}
+
+function fetchRules(url, uuid) {
+    return fetch(`${url}/game/${uuid}/rules`, {});
+}
+
 function fetchState(url, uuid, index) {
     return fetch(`${url}/game/${uuid}/state/${index}`, {});
 }
@@ -50,4 +58,4 @@ function postTick(url, uuid) {
     );
 }
 
-export { fetchGames, fetchGame, fetchState, fetchCurrentGameNumber, fetchPossibleActions, validateActionParameters, postAction, postUndoAction, postTick };
+export { fetchGames, fetchGame, fetchOpenHours, fetchRules, fetchState, fetchCurrentGameNumber, fetchPossibleActions, validateActionParameters, postAction, postUndoAction, postTick };

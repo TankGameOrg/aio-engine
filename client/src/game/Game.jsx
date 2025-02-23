@@ -1,5 +1,5 @@
 import {useParams} from "react-router-dom";
-import {fetchGame, fetchState, postTick, postUndoAction} from "../util/fetch.js";
+import {fetchGame, fetchRules, fetchState, postTick, postUndoAction} from "../util/fetch.js";
 import {SERVER_URL} from "../util/constants.js";
 import {useCallback, useEffect, useRef, useState} from "react";
 import Board from "./board/Board.jsx";
@@ -7,6 +7,8 @@ import promptMatches from "../util/prompt.js";
 import Logbook from "./Logbook.jsx";
 import ActionSelector from "./ActionSelector.jsx";
 import Menu from "./Menu.jsx";
+import useOpenHours, {daySpecToString} from "./UseOpenHours.js";
+import Markdown from "marked-react";
 import "./Game.css";
 
 function Game() {
@@ -26,21 +28,27 @@ function Game() {
         }
     );
 
+    const running = state?.$RUNNING ?? true;
+    const winners = state?.$WINNER ?? "";
+
     const UNLOADED_GAME_NAME = "Loading...";
 
     const [game, setGame] = useState({
         name: UNLOADED_GAME_NAME,
         logbook: []
     });
+    const [rules, setRules] = useState(null);
 
     const [positionOptions, setPositionOptions] = useState([]);
     const selectPositionFunction = useRef(() => {});
     const selectPlayerForActionFunction = useRef(() => {});
     const clearActionSelectorFunction = useRef(() => {});
+    const scrollToActiveGameFunction = useRef(() => {});
 
     const updateActiveGame = useCallback((newGame) => {
         if (activeGame === newGame - 1 || activeGame > newGame || game.name === UNLOADED_GAME_NAME) {
             setActiveGame(newGame);
+            scrollToActiveGameFunction.current();
         }
     }, [activeGame]);
 
@@ -59,6 +67,7 @@ function Game() {
 
     useEffect(() => {
         updateLogbookForever();
+        fetchRules(SERVER_URL, uuid).then(res => res.json()).then(data => setRules(<Markdown value={data?.rules} />));
     }, []);
 
     useEffect(() => {
@@ -83,6 +92,21 @@ function Game() {
         }
     }, [updateLogbook]);
 
+    const [isOpen, willOpen, timeUntilOpen, openHours] = useOpenHours(uuid);
+    openHours.sort((a, b) => a.day - b.day);
+    if (!isOpen) {
+        return (
+            <div>
+                <h1>This game is currently closed</h1>
+                { willOpen &&
+                    <h2>The game will open in {timeUntilOpen} {timeUntilOpen === 1 ? "minute" : "minutes"}</h2>
+                }
+                <h2>Open Hours</h2>
+                { openHours.map((date) => <p>{daySpecToString(date)}</p>) }
+            </div>
+        );
+    }
+
     const gameIsCurrent = game.logbook.length === activeGame;
     const allPlayers = state.$PLAYERS.elements.map((player) => player.$NAME).sort((a, b) => a.localeCompare(b));
     const livingPlayers = state.$BOARD.units.filter((unit) => unit.$PLAYER_REF !== undefined).map((unit) => unit.$PLAYER_REF.name);
@@ -94,19 +118,28 @@ function Game() {
                 {game.name}
             </h2>
             <div className="logbook-board-container">
-                <Logbook logbook={game.logbook} activeGame={activeGame} setActiveGame={setActiveGame} />
+                <Logbook logbook={game.logbook} activeGame={activeGame} setActiveGame={setActiveGame} scrollToActiveGameFunction={scrollToActiveGameFunction} />
                 <Board board={state.$BOARD} selectMode={positionOptions.length > 0} gameIsCurrent={gameIsCurrent} positionOptions={positionOptions} selectPosition={selectPositionFunction} clearSelectionMode={() => setPositionOptions([])} selectPlayerForActionFunction={selectPlayerForActionFunction} />
-                <Menu advanceTick={advanceTick} undoAction={undoAction} players={councilPlayers} setActionPlayer={selectPlayerForActionFunction} />
+                <Menu advanceTick={advanceTick} undoAction={undoAction} players={councilPlayers} setActionPlayer={selectPlayerForActionFunction} openHours={openHours} rules={rules} />
             </div>
-            <ActionSelector
-                enabled={gameIsCurrent}
-                uuid={uuid}
-                update={updateLogbook}
-                setPositionOptions={setPositionOptions}
-                selectPositionFunction={selectPositionFunction}
-                selectPlayerForActionFunction={selectPlayerForActionFunction}
-                clearActionSelectorFunction={clearActionSelectorFunction}
-            />
+            { running ?
+                <ActionSelector
+                    enabled={gameIsCurrent}
+                    uuid={uuid}
+                    update={updateLogbook}
+                    setPositionOptions={setPositionOptions}
+                    selectPositionFunction={selectPositionFunction}
+                    selectPlayerForActionFunction={selectPlayerForActionFunction}
+                    clearActionSelectorFunction={clearActionSelectorFunction}
+                />
+                :
+                <>
+                    <h2>The game is over!</h2>
+                    <span>
+                        { winners === "" ? "There are no winners" : `Winners: ${winners}` }
+                    </span>
+                </>
+            }
         </div>
     );
 }

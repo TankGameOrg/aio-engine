@@ -50,7 +50,6 @@ public class Bless implements Action {
             return new Error(Error.Type.OTHER, "Sponsored tank has not yet acted today");
         }
 
-        System.out.println(player);
         entry.put(Attribute.TARGET_PLAYER, target);
         player.put(Attribute.CAN_BLESS, false);
         tank.put(Attribute.CAN_ACT, true);
