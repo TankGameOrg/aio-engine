@@ -38,6 +38,7 @@ function Game() {
         logbook: []
     });
     const [rules, setRules] = useState(null);
+    const loading = useRef(true);
 
     const [positionOptions, setPositionOptions] = useState([]);
     const selectPositionFunction = useRef(() => {});
@@ -46,9 +47,9 @@ function Game() {
     const scrollToActiveGameFunction = useRef(() => {});
 
     const updateActiveGame = useCallback((newGame) => {
-        if (activeGame === newGame - 1 || activeGame > newGame || game.name === UNLOADED_GAME_NAME) {
+        if (activeGame === newGame - 1 || activeGame > newGame || loading.current) {
             setActiveGame(newGame);
-            scrollToActiveGameFunction.current();
+            scrollToActiveGameFunction.current(newGame);
         }
     }, [activeGame]);
 
@@ -56,6 +57,7 @@ function Game() {
         return fetchGame(SERVER_URL, uuid).then(res => res.json()).then(data => {
             setGame({...game, logbook: data.logbook, name: data.name});
             updateActiveGame(data.logbook.length);
+            loading.current = false;
         });
     }, [game, updateActiveGame]);
 

@@ -4,9 +4,9 @@ import {useRef} from "react";
 
 function Logbook({logbook, activeGame, setActiveGame, scrollToActiveGameFunction}) {
 
-    const currentAction = useRef(null);
+    const currentAction = useRef([]);
 
-    scrollToActiveGameFunction.current = () => currentAction.current?.scrollIntoView();
+    scrollToActiveGameFunction.current = (index) => currentAction.current[index]?.scrollIntoView();
     
     return (
         <div className="logbook-wrapper">
@@ -16,7 +16,7 @@ function Logbook({logbook, activeGame, setActiveGame, scrollToActiveGameFunction
                     <li key={0} onClick={() => setActiveGame(0)}>
                         <a className={`logbook-entry ${activeGame === 0 ? "logbook-entry-current" : ""}`}>Initial State</a>
                     </li>
-                    {logbook.map((entry, index) => <li key={index + 1} ref={index + 1 === activeGame ? currentAction : null} onClick={() => setActiveGame(index + 1)}>
+                    {logbook.map((entry, index) => <li key={index + 1} ref={(element) => currentAction[index] = element} onClick={() => setActiveGame(index + 1)}>
                         <a className={`logbook-entry ${index + 1 === activeGame ? "logbook-entry-current" : ""}`}>{entryToText(entry)}</a>
                     </li>)}
                 </ul>
