@@ -4,7 +4,6 @@ import pro.trevor.tankgame.attribute.Attribute;
 import pro.trevor.tankgame.rule.action.Action;
 import pro.trevor.tankgame.rule.action.Error;
 import pro.trevor.tankgame.rule.action.LogEntry;
-import pro.trevor.tankgame.rule.impl.action.specialize.Specialty;
 import pro.trevor.tankgame.state.State;
 import pro.trevor.tankgame.state.board.unit.Tank;
 import pro.trevor.tankgame.state.meta.PlayerRef;
@@ -37,6 +36,7 @@ public class Upgrade implements Action {
             return new Error(Error.Type.OTHER, "Subject tank already has an upgrade");
         }
 
+        tank.put(Attribute.SCRAP, tank.getUnsafe(Attribute.SCRAP) - 6);
         tank.put(Attribute.CAN_ACT, false);
         tank.put(Attribute.BOON, boon);
         boon.apply(tank);

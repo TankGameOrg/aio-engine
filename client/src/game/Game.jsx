@@ -129,6 +129,7 @@ function Game() {
                     enabled={gameIsCurrent}
                     uuid={uuid}
                     update={updateLogbook}
+                    updateActiveGame={() => scrollToActiveGameFunction.current(activeGame)}
                     setPositionOptions={setPositionOptions}
                     selectPositionFunction={selectPositionFunction}
                     selectPlayerForActionFunction={selectPlayerForActionFunction}

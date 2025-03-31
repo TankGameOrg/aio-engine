@@ -4,7 +4,7 @@ import {useCallback, useEffect, useState} from "react";
 import ParameterSelector from "./ParameterSelector.jsx";
 import "./ActionSelector.css"
 
-function ActionSelector({uuid, enabled, update, setPositionOptions, selectPositionFunction, selectPlayerForActionFunction, clearActionSelectorFunction}) {
+function ActionSelector({uuid, enabled, update, updateActiveGame, setPositionOptions, selectPositionFunction, selectPlayerForActionFunction, clearActionSelectorFunction}) {
     if (!enabled) {
         return (<></>);
     }
@@ -93,6 +93,7 @@ function ActionSelector({uuid, enabled, update, setPositionOptions, selectPositi
                                    id={action.name}
                                    disabled={action.error}
                                    onClick={() => {
+                                       setPositionOptions([]);
                                        setSelectedAction(action);
                                        setChosenActionParameters(DEFAULT_CHOSEN_ACTION_PARAMETERS);
                                        setError(DEFAULT_STRING);
@@ -134,7 +135,8 @@ function ActionSelector({uuid, enabled, update, setPositionOptions, selectPositi
                             if (json.error) {
                                 setError(json.message);
                             } else {
-                                update()
+                                update();
+                                updateActiveGame();
                             }
                         });
                         setPlayer(DEFAULT_STRING);
