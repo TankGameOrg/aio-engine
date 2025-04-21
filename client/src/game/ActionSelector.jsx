@@ -81,7 +81,10 @@ function ActionSelector({uuid, enabled, update, updateActiveGame, setPositionOpt
         <div className="selector-container">
             { player !== DEFAULT_STRING && <div>
                 <h2 className="select-action-text">Select an action for {player}</h2>
-                <button className="close-button" onClick={() => clearActionSelectorFunction.current()}>Close</button>
+                <button className="close-button" onClick={() => {
+                    setPositionOptions([]);
+                    clearActionSelectorFunction.current();
+                }}>Close</button>
             </div> }
             <div className="selection">
                 <div className="action-select select-margin">

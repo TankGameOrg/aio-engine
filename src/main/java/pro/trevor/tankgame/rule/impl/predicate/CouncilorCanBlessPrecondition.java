@@ -9,7 +9,7 @@ import pro.trevor.tankgame.state.meta.Player;
 public class CouncilorCanBlessPrecondition implements Precondition {
     @Override
     public Error test(State state, Player player) {
-        if (player.getOrElse(Attribute.CAN_BLESS, true)) {
+        if (!player.getOrElse(Attribute.CAN_BLESS, true)) {
             return new Error(Error.Type.OTHER, "Player has already blessed their patron");
         }
 

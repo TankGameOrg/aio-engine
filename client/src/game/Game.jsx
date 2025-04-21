@@ -46,6 +46,11 @@ function Game() {
     const clearActionSelectorFunction = useRef(() => {});
     const scrollToActiveGameFunction = useRef(() => {});
 
+    useEffect(() => {
+        scrollToActiveGameFunction.current(game.logbook.length - 1)
+        // setTimeout(() => , 100);
+    }, [game]);
+
     const updateActiveGame = useCallback((newGame) => {
         if (activeGame === newGame - 1 || activeGame > newGame || loading.current) {
             setActiveGame(newGame);

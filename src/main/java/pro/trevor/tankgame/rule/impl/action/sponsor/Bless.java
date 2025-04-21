@@ -31,7 +31,7 @@ public class Bless implements Action {
             return new Error(Error.Type.OTHER, "Subject does not have a sponsored player");
         }
 
-        if (player.getOrElse(Attribute.CAN_BLESS, false)) {
+        if (!player.getOrElse(Attribute.CAN_BLESS, true)) {
             return new Error(Error.Type.OTHER, "Subject has already performed the bless action");
         }
 

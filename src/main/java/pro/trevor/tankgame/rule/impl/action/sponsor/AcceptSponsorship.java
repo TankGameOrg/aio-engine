@@ -54,6 +54,7 @@ public class AcceptSponsorship implements Action {
         tank.put(Attribute.SPONSOR, target);
         targetPlayer.put(Attribute.SPONSORED_PLAYER, subject);
         targetPlayer.put(Attribute.IS_SPONSOR, true);
+        targetPlayer.put(Attribute.CAN_BLESS, true);
 
         return Error.NONE;
     }
