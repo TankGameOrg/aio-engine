@@ -1,6 +1,6 @@
 import "./BoardCell.css"
 import Popup from "reactjs-popup";
-import {codeObjectToString, ENGLISH_LOCALE, objectToArray, objectToLocalizedObject} from "../../util/locale.js";
+import {codeObjectToString, ENGLISH_LOCALE, objectToOrderedLocalizedObject} from "../../util/locale.js";
 import {useState} from "react";
 import Tank from "../../../assets/images/Tank.png"
 import Wall from "../../../assets/images/Wall.png"
@@ -70,7 +70,7 @@ function BoardCell({unit, floor, gameIsCurrent, selectMode, enabled, onClick, se
     let unitAttributes = [];
     let unitClassText = "Empty";
     if (unitClass) {
-        unitAttributes = objectToArray(objectToLocalizedObject(ENGLISH_LOCALE, unit));
+        unitAttributes = objectToOrderedLocalizedObject(ENGLISH_LOCALE, unit);
         if (unitClass === "PseudoTank") {
             unitClassText = "Fallen";
         } else if (unitClass === "Tank") {

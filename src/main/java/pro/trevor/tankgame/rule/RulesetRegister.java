@@ -11,7 +11,6 @@ public interface RulesetRegister {
     void registerPlayerRules(Ruleset ruleset);
     void registerTickRules(Ruleset ruleset);
     void registerConditionalRules(Ruleset ruleset);
-    void registerInvariantRules(Ruleset ruleset);
     void registerDamageHandlers(List<Damage> damageHandlers);
     void registerDestroyHandlers(List<Destroy> destroysHandlers);
 

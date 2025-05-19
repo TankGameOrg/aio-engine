@@ -19,7 +19,7 @@ function ParameterSelector({parameter, callback, handlePositionSelection, select
         } else if (parameter.type === "PlayerRef") {
             return value?.name;
         } else if (parameter.type === "Specialty" || parameter.type === "Boon") {
-            return value?.variant;
+            return value?.name;
         } else {
             return `Unhandled type ${parameter.type}`;
         }
@@ -58,7 +58,7 @@ function ParameterSelector({parameter, callback, handlePositionSelection, select
         selector = "Unimplemented";
     } else {
         // ERROR
-        selector = "Unknown parameter bound type "+ parameter.bound;
+        selector = "Unknown parameter bound type " + parameter.bound;
     }
 
     return (

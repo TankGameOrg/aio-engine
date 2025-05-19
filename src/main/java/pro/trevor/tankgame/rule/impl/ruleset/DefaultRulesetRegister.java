@@ -20,10 +20,13 @@ import pro.trevor.tankgame.rule.impl.action.Shoot;
 import pro.trevor.tankgame.rule.impl.action.fallen.MoveFallen;
 import pro.trevor.tankgame.rule.impl.action.fallen.RemainFallen;
 import pro.trevor.tankgame.rule.impl.action.fallen.ShootFallen;
+import pro.trevor.tankgame.rule.impl.action.specialize.AttributeModifier;
 import pro.trevor.tankgame.rule.impl.action.specialize.Specialize;
+import pro.trevor.tankgame.rule.impl.action.specialize.Specialty;
 import pro.trevor.tankgame.rule.impl.action.sponsor.AcceptSponsorship;
 import pro.trevor.tankgame.rule.impl.action.sponsor.Bless;
 import pro.trevor.tankgame.rule.impl.action.sponsor.OfferSponsorship;
+import pro.trevor.tankgame.rule.impl.action.upgrade.Boon;
 import pro.trevor.tankgame.rule.impl.action.upgrade.Upgrade;
 import pro.trevor.tankgame.rule.impl.apply.ApplyRandomActionOption;
 import pro.trevor.tankgame.rule.impl.apply.ModifyAttribute;
@@ -37,6 +40,7 @@ import pro.trevor.tankgame.state.board.unit.Tank;
 import pro.trevor.tankgame.state.meta.Player;
 import pro.trevor.tankgame.util.LineOfSight;
 
+import java.util.Collections;
 import java.util.List;
 
 public class DefaultRulesetRegister implements RulesetRegister {
@@ -65,15 +69,29 @@ public class DefaultRulesetRegister implements RulesetRegister {
                 new Description("Repair", "Spend two scrap to repair a target tank, wall, or bridge within range for two durability"),
                 new ActionRule(new Predicate(List.of(new PlayerTankIsPresentPrecondition(), new PlayerTankHasScrapPrecondition(2), new PlayerTankCanActPreondition()), List.of()),
                         new Repair(2, 2), new Parameter<>("Target", Attribute.TARGET_POSITION, new RepairPositionSupplier())));
+
+        Specialty offenseSpec = new Specialty("Offense", new AttributeModifier(Attribute.DAMAGE_MODIFIER, 1), new AttributeModifier(Attribute.DEFENSE_MODIFIER, -1));
+        Specialty defenseSpec = new Specialty("Defense", new AttributeModifier(Attribute.DAMAGE_MODIFIER, -1), new AttributeModifier(Attribute.DEFENSE_MODIFIER, 2));
+        Specialty scoutSpec = new Specialty("Scout", new AttributeModifier(Attribute.DEFENSE_MODIFIER, -1), new AttributeModifier(Attribute.SPEED, 1), new AttributeModifier(Attribute.RANGE, 1));
+        Specialty meleeSpec = new Specialty("Melee", new AttributeModifier(Attribute.DAMAGE_MODIFIER, 1), new AttributeModifier(Attribute.DEFENSE_MODIFIER, -1), new AttributeModifier(Attribute.SPEED, 1), new AttributeModifier(Attribute.RANGE, -1));
+        List<Specialty> specialties = List.of(offenseSpec, defenseSpec, scoutSpec, meleeSpec);
         actionRuleset.add(
                 new Description("Specialize", "Spend four scrap to hone your tank to a specialized style of combat"),
                 new ActionRule(new Predicate(List.of(new PlayerTankIsPresentPrecondition(), new PlayerTankHasScrapPrecondition(4), new PlayerTankCanActPreondition()), List.of()),
-                        new Specialize(4), new Parameter<>("Specialty", Attribute.TARGET_SPECIALTY, new SpecialtySupplier()))
+                        new Specialize(4, specialties), new Parameter<>("Specialty", Attribute.TARGET_SPECIALTY, new SpecialtySupplier(specialties))
+                )
         );
+
+        Boon attackBoon = new Boon("Attack", Attribute.DAMAGE_MODIFIER, 1);
+        Boon defenseBoon = new Boon("Defence", Attribute.DEFENSE_MODIFIER, 1);
+        Boon rangeBoon = new Boon("Range", Attribute.RANGE, 1);
+        Boon speedBoon = new Boon("Speed", Attribute.SPEED, 1);
+        List<Boon> boons = List.of(attackBoon, defenseBoon, rangeBoon, speedBoon);
         actionRuleset.add(
                 new Description("Upgrade", "Once per game, spend six scrap to upgrade an attribute of your tank"),
                 new ActionRule(new Predicate(List.of(new PlayerTankIsPresentPrecondition(), new PlayerTankHasNoBoonPrecondition(), new PlayerTankHasScrapPrecondition(6), new PlayerTankCanActPreondition()), List.of()),
-                        new Upgrade(), new Parameter<>("Boon", Attribute.TARGET_BOON, new BoonSupplier()))
+                        new Upgrade(boons), new Parameter<>("Boon", Attribute.TARGET_BOON, new BoonSupplier(boons))
+                )
         );
         actionRuleset.add(
                 new Description("Accept Sponsorship", "Accept the sponsorship of a councilor; they may offer you certain benefits"),
@@ -110,7 +128,7 @@ public class DefaultRulesetRegister implements RulesetRegister {
     @Override
     public void registerTickRules(Ruleset ruleset) {
         ApplyRuleset tickRuleset = ruleset.getTickRuleset();
-        tickRuleset.add(new ApplyRule(new ApplyRandomActionOption(ruleset)));
+        tickRuleset.add(new ApplyRule(new ApplyRandomActionOption(ruleset, LineOfSight::hasLineOfSight)));
         tickRuleset.add(new TargetApplyRule<>(new ModifyAttribute<>(Attribute.CAN_ACT, ((state, target) -> true)), Tank.class));
         tickRuleset.add(new TargetApplyRule<>(new ModifyAttribute<>(Attribute.HAS_COMPELLED_FALLEN, ((state, target) -> false)), Player.class));
     }
@@ -122,15 +140,10 @@ public class DefaultRulesetRegister implements RulesetRegister {
     }
 
     @Override
-    public void registerInvariantRules(Ruleset ruleset) {
-        ApplyRuleset invariantRuleset = ruleset.getInvariantRuleset();
-    }
-
-    @Override
     public void registerDamageHandlers(List<Damage> damageHandlers) {
-        damageHandlers.add(new Damage(new HasDurabilityPredicate().and(new IsTankPredicate()), new DamageDurabilityHandle(new int[]{1, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 6})));
-        damageHandlers.add(new Damage(new HasDurabilityPredicate().and(new IsPseudoTankPredicate()), new DamageDurabilityHandle(new int[]{1, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 6})));
-        damageHandlers.add(new Damage(new HasDurabilityPredicate(), new DamageDurabilityHandle()));
+        damageHandlers.add(new Damage(new HasDurabilityPredicate().and(new IsTankPredicate()), new DamageDurabilityHandle(0, new int[]{1, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 6})));
+        damageHandlers.add(new Damage(new HasDurabilityPredicate().and(new IsPseudoTankPredicate()), new DamageDurabilityHandle(0, new int[]{1, 2, 2, 3, 3, 3, 4, 4, 4, 5, 5, 6})));
+        damageHandlers.add(new Damage(new HasDurabilityPredicate(), new DamageDurabilityHandle(0)));
     }
 
     @Override

@@ -1,9 +1,9 @@
-package pro.trevor.tankgame.state;
+package pro.trevor.tankgame.state.builder;
 
 import org.json.JSONObject;
 import pro.trevor.tankgame.attribute.Attribute;
-import pro.trevor.tankgame.attribute.AttributeEntity;
 import pro.trevor.tankgame.attribute.ListEntity;
+import pro.trevor.tankgame.state.State;
 import pro.trevor.tankgame.state.board.*;
 import pro.trevor.tankgame.state.board.unit.Tank;
 import pro.trevor.tankgame.state.meta.Council;
@@ -11,10 +11,7 @@ import pro.trevor.tankgame.state.meta.Player;
 import pro.trevor.tankgame.util.Position;
 
 import java.lang.reflect.InvocationTargetException;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class Builder {
@@ -27,6 +24,7 @@ public class Builder {
         this.templates = new HashMap<>();
         this.board = new Board(width, height);
 
+        players = new ArrayList<>(players);
         this.players = new ListEntity<>();
         Collections.shuffle(players);
         for (String player : players) {

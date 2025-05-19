@@ -10,6 +10,7 @@ import pro.trevor.tankgame.rule.handle.Damage;
 import pro.trevor.tankgame.rule.handle.Destroy;
 import pro.trevor.tankgame.rule.handle.cause.PseudoTankCause;
 import pro.trevor.tankgame.rule.impl.action.fallen.ActionType;
+import pro.trevor.tankgame.rule.impl.parameter.LineOfSightFunction;
 import pro.trevor.tankgame.state.State;
 import pro.trevor.tankgame.state.board.IUnit;
 import pro.trevor.tankgame.state.board.unit.EmptyUnit;
@@ -23,9 +24,11 @@ import java.util.Optional;
 public class ApplyRandomActionOption implements Apply {
 
     private final Ruleset ruleset;
+    private final LineOfSightFunction lineOfSightFunction;
 
-    public ApplyRandomActionOption(Ruleset ruleset) {
+    public ApplyRandomActionOption(Ruleset ruleset, LineOfSightFunction lineOfSightFunction) {
         this.ruleset = ruleset;
+        this.lineOfSightFunction = lineOfSightFunction;
     }
 
     @Override
@@ -51,25 +54,32 @@ public class ApplyRandomActionOption implements Apply {
         }
 
         ActionType actionType = selection.getUnsafe(Attribute.FALLEN_ACTION);
-        switch (actionType) {
+        boolean success = switch (actionType) {
             case SHOOT -> shoot(state, selection, pseudoTank);
             case MOVE -> move(state, selection, pseudoTank);
-            case REMAIN -> { /* Intentionally left blank */ }
-        }
+            case REMAIN -> true;
+        };
+
+        selection.put(Attribute.SUCCESS, success);
 
         pseudoTank.put(Attribute.ACTION_OPTIONS, new ListEntity<>());
         return Optional.of(selection);
     }
 
-    private void shoot(State state, LogEntry entry, PseudoTank pseudoTank) {
+    private boolean shoot(State state, LogEntry entry, PseudoTank pseudoTank) {
+
         Optional<Position> maybePosition = entry.get(Attribute.TARGET_POSITION);
         if (maybePosition.isEmpty()) {
-            return;
+            return false;
+        }
+
+        if (lineOfSightFunction.inLineOfSight(state, pseudoTank.getPosition(), maybePosition.get())) {
+            return false;
         }
 
         Optional<IUnit> maybeUnit = state.getBoard().getUnit(maybePosition.get());
         if (maybeUnit.isEmpty()) {
-            return;
+            return true;
         }
 
         IUnit unit = maybeUnit.get();
@@ -89,14 +99,26 @@ public class ApplyRandomActionOption implements Apply {
                 }
             }
         }
+        return true;
     }
 
-    private void move(State state, LogEntry entry, PseudoTank pseudoTank) {
+    private boolean move(State state, LogEntry entry, PseudoTank pseudoTank) {
         Position oldPosition = pseudoTank.getPosition();
         Position newPosition = entry.getOrElse(Attribute.TARGET_POSITION, oldPosition);
+
+        Optional<IUnit> maybeUnit = state.getBoard().getUnit(newPosition);
+
+        if (maybeUnit.isEmpty()) {
+            return false;
+        }
+
+        if (!(maybeUnit.get() instanceof EmptyUnit)) {
+            return false;
+        }
 
         pseudoTank.setPosition(newPosition);
         state.getBoard().putUnit(new EmptyUnit(oldPosition));
         state.getBoard().putUnit(pseudoTank);
+        return true;
     }
 }
