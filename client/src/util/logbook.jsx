@@ -24,13 +24,13 @@ export default function entryToText(entry) {
         } else if (entry.action === "Move") {
             return `${entry.subject.name} moves to ${positionToString(entry.target_position)}`;
         } else if (entry.action === "Specialize") {
-            return `${entry.subject.name} specializes in ${entry.target_specialty.variant}`;
+            return `${entry.subject.name} specializes in ${entry.target_specialty.name}`;
         } else if (entry.action === "Mine") {
             return `${entry.subject.name} mines and finds ${entry.scrap} scrap`;
         } else if (entry.action === "Repair") {
             return `${entry.subject.name} repairs unit on ${positionToString(entry.target_position)}`;
         } else if (entry.action === "Upgrade") {
-            return `${entry.subject.name} upgrades ${entry.target_boon.variant}`;
+            return `${entry.subject.name} upgrades ${entry.target_boon.name}`;
         } else if (entry.action === "Accept Sponsorship") {
             return `${entry.subject.name} accepts sponsorship from ${entry.target_player.name}`;
         } else if (entry.action === "Offer Sponsorship") {

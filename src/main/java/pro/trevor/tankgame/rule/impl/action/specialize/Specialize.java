@@ -8,14 +8,18 @@ import pro.trevor.tankgame.state.State;
 import pro.trevor.tankgame.state.board.unit.Tank;
 import pro.trevor.tankgame.state.meta.PlayerRef;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class Specialize implements Action {
 
     private final int cost;
+    private final List<Specialty> availableSpecialties;
 
-    public Specialize(int cost) {
+    public Specialize(int cost, List<Specialty> availableSpecialties) {
         this.cost = cost;
+        this.availableSpecialties = new ArrayList<>(availableSpecialties);
     }
 
     @Override
@@ -41,6 +45,10 @@ public class Specialize implements Action {
 
         if (tank.getOrElse(Attribute.SCRAP, 0) < cost) {
             return new Error(Error.Type.OTHER, "Subject tank has insufficient scrap");
+        }
+
+        if (!availableSpecialties.contains(specialty)) {
+            return new Error(Error.Type.OTHER, "Target specialty does not exist");
         }
 
         if (tank.has(Attribute.SPECIALTY)) {

@@ -2,20 +2,13 @@ package pro.trevor.tankgame.web.server;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.springframework.web.bind.annotation.*;
 import pro.trevor.tankgame.Game;
 import pro.trevor.tankgame.attribute.Attribute;
 import pro.trevor.tankgame.attribute.ListEntity;
 import pro.trevor.tankgame.rule.action.LogEntry;
-import pro.trevor.tankgame.rule.impl.ruleset.DefaultRulesetRegister;
-import pro.trevor.tankgame.state.State;
-import pro.trevor.tankgame.state.board.Board;
-import pro.trevor.tankgame.state.board.unit.Tank;
-import pro.trevor.tankgame.state.meta.Council;
 import pro.trevor.tankgame.state.meta.Player;
 import pro.trevor.tankgame.state.meta.PlayerRef;
-import pro.trevor.tankgame.util.Position;
 
 import java.io.File;
 import java.net.URLDecoder;
@@ -42,8 +35,8 @@ public class Server {
 
         JSONArray gamesJson = new JSONArray();
         for (GameInfo gameInfo : games) {
-            JSONObject gameInfoJson = gameInfo.toJsonWithoutState();
-            gameInfoJson.put("running", gameInfo.game().getState().getOrElse(Attribute.RUNNING, true));
+            JSONObject gameInfoJson = gameInfo.toJson();
+            gameInfoJson.put("running", storage.getGameByUUID(gameInfo.uuid()).getState().getOrElse(Attribute.RUNNING, true));
             gamesJson.put(gameInfoJson);
         }
 
@@ -64,13 +57,12 @@ public class Server {
             return error(new JSONObject().put("message", "Invalid game UUID"));
         }
 
-        JSONObject gameInfoJson = gameInfo.toJsonWithoutState();
+        JSONObject gameInfoJson = gameInfo.toJson();
 
         JSONArray logbookJson = new JSONArray();
         for (LogEntry logEntry : logbook) {
             logbookJson.put(logEntry.toJson());
         }
-
         gameInfoJson.put("logbook", logbookJson);
 
         return gameInfoJson.toString();
@@ -83,15 +75,15 @@ public class Server {
         }
 
         UUID uuid = UUID.fromString(uuidString);
-        GameInfo gameInfo = storage.getGameInfoByUUID(uuid);
+        Game game = storage.getGameByUUID(uuid);
 
-        if (gameInfo == null) {
+        if (game == null) {
             return error(new JSONObject().put("message", "Invalid game UUID"));
         }
 
         LogEntry logEntry = new LogEntry(new JSONObject(requestBody));
 
-        return gameInfo.game().checkActionConditions(logEntry).toString();
+        return game.checkActionConditions(logEntry).toString();
     }
 
     @PostMapping("/game/{uuid}/action")
@@ -101,9 +93,9 @@ public class Server {
         }
 
         UUID uuid = UUID.fromString(uuidString);
-        GameInfo gameInfo = storage.getGameInfoByUUID(uuid);
+        Game game = storage.getGameByUUID(uuid);
 
-        if (gameInfo == null) {
+        if (game == null) {
             return error(new JSONObject().put("message", "Invalid game UUID"));
         }
 
@@ -113,9 +105,9 @@ public class Server {
         }
 
         LogEntry logEntry = new LogEntry(new JSONObject(requestBody));
-        JSONObject output = gameInfo.game().ingestEntry(logEntry);
+        JSONObject output = game.ingestEntry(logEntry);
         if (!output.getBoolean("error")) {
-            storage.saveGameAfterAction(gameInfo, logEntry);
+            storage.saveGameAfterAction(uuid, game, logEntry);
         }
 
         return output.toString();
@@ -148,14 +140,14 @@ public class Server {
         }
 
         UUID uuid = UUID.fromString(uuidString);
-        GameInfo gameInfo = storage.getGameInfoByUUID(uuid);
+        Game game = storage.getGameByUUID(uuid);
 
-        if (gameInfo == null) {
+        if (game == null) {
             return error(new JSONObject().put("message", "Invalid game UUID"));
         }
 
-        LogEntry logEntry = new LogEntry(Map.of(Attribute.TICK, gameInfo.game().getState().getOrElse(Attribute.TICK, 0) + 1));
-        JSONObject output = gameInfo.game().ingestEntry(logEntry);
+        LogEntry logEntry = new LogEntry(Map.of(Attribute.TICK, game.getState().getOrElse(Attribute.TICK, 0) + 1));
+        JSONObject output = game.ingestEntry(logEntry);
         if (!output.getBoolean("error")) {
             JSONArray entries = output.getJSONArray("entries");
             ListEntity<LogEntry> subEntries = new ListEntity<>();
@@ -164,7 +156,7 @@ public class Server {
                 subEntries.add(entry);
             }
             logEntry.put(Attribute.SUBENTRIES, subEntries);
-            storage.saveGameAfterAction(gameInfo, logEntry);
+            storage.saveGameAfterAction(uuid, game, logEntry);
         }
 
         return output.toString();
@@ -177,20 +169,20 @@ public class Server {
         }
 
         UUID uuid = UUID.fromString(uuidString);
-        GameInfo gameInfo = storage.getGameInfoByUUID(uuid);
+        Game game = storage.getGameByUUID(uuid);
 
-        if (gameInfo == null) {
+        if (game == null) {
             return error(new JSONObject().put("message", "Invalid game UUID"));
         }
 
         player = URLDecoder.decode(player, StandardCharsets.UTF_8);
 
-        Optional<Player> maybePlayer = gameInfo.game().getState().getPlayer(new PlayerRef(player));
+        Optional<Player> maybePlayer = game.getState().getPlayer(new PlayerRef(player));
         if (maybePlayer.isEmpty()) {
             return error(new JSONObject().put("message", "Invalid player"));
         }
 
-        return gameInfo.game().possibleActions(new PlayerRef(player)).toString();
+        return game.possibleActions(new PlayerRef(player)).toString();
     }
 
     @GetMapping("/game/{uuid}/state/current")

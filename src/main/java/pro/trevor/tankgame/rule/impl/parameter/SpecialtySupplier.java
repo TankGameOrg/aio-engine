@@ -8,11 +8,20 @@ import pro.trevor.tankgame.rule.impl.action.specialize.Specialty;
 import pro.trevor.tankgame.state.State;
 import pro.trevor.tankgame.state.meta.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class SpecialtySupplier implements AvailableParameterSupplier<Specialty> {
+
+    private final List<Specialty> specialties;
+
+    public SpecialtySupplier(List<Specialty> specialties) {
+        this.specialties = new ArrayList<>(specialties);
+    }
+
     @Override
     public ParameterBound<Specialty> possibleParameters(State state, Player player) {
-        return new DiscreteValueBound<>(Attribute.TARGET_SPECIALTY, Arrays.asList(Specialty.values()));
+        return new DiscreteValueBound<>(Attribute.TARGET_SPECIALTY, specialties);
     }
 }

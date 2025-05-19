@@ -2,6 +2,7 @@ package pro.trevor.tankgame.web.server;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
+import pro.trevor.tankgame.Game;
 import pro.trevor.tankgame.rule.action.LogEntry;
 import pro.trevor.tankgame.state.State;
 
@@ -10,19 +11,19 @@ import java.util.*;
 
 public class Storage {
 
+    private record GameFiles(GameInfo gameInfo, Game game, List<LogEntry> logbook) {}
+
     private static final String JSON_FILE_SUFFIX = ".json";
-    private static final String STATE_FILE_NAME = "game" + JSON_FILE_SUFFIX;
+    private static final String INFO_FILE_NAME = "info" + JSON_FILE_SUFFIX;
     private static final String LOGBOOK_FILE_NAME = "log" + JSON_FILE_SUFFIX;
     private static final String STATE_HISTORY_DIRECTORY_NAME = "history";
 
     private final File base;
-    private final Map<UUID, GameInfo> games;
-    private final Map<UUID, List<LogEntry>> logbooks;
+    private final Map<UUID, GameFiles> games;
 
     public Storage(File base) {
         this.base = base.getAbsoluteFile();
         this.games = new HashMap<>();
-        this.logbooks = new HashMap<>();
 
         boolean success = this.base.mkdirs();
         assert success;
@@ -58,12 +59,18 @@ public class Storage {
         return new File(gameDirectory(uuid), STATE_HISTORY_DIRECTORY_NAME);
     }
 
-    private File stateFile(UUID uuid) {
-        return new File(gameDirectory(uuid), STATE_FILE_NAME);
+    private File infoFile(UUID uuid) {
+        return new File(gameDirectory(uuid), INFO_FILE_NAME);
     }
 
     private File logbookFile(UUID uuid) {
         return new File(gameDirectory(uuid), LOGBOOK_FILE_NAME);
+    }
+
+    private void updateGame(UUID uuid, Game newGame) {
+        GameFiles files = games.get(uuid);
+        GameFiles newFiles = new GameFiles(files.gameInfo, newGame, files.logbook);
+        games.put(uuid, newFiles);
     }
 
     public void loadGamesFromFilesystem() {
@@ -80,7 +87,7 @@ public class Storage {
     public void loadGameFromDirectory(UUID uuid) {
         Log.LOGGER.info("Loading game with UUID {}", uuid);
 
-        File gameFile = stateFile(uuid);
+        File gameFile = infoFile(uuid);
         JSONObject gameInfoJson = readJsonFromFile(gameFile);
 
         if (gameInfoJson == null) {
@@ -90,6 +97,9 @@ public class Storage {
 
         GameInfo gameInfo = new GameInfo(gameInfoJson);
         assert gameInfo.uuid().equals(uuid);
+
+        State state = readStateFromHistory(uuid, getGameStateHistorySize(uuid) - 1);
+        Game game = new Game(gameInfo.rulesetRegister(), state);
 
         File logbookFile = logbookFile(uuid);
         JSONArray logbookJson = readJsonArrayFromFile(logbookFile);
@@ -106,19 +116,22 @@ public class Storage {
 
         Log.LOGGER.debug("Found game '{}' with UUID {}", gameInfo.name(), gameInfo.uuid());
 
-        games.put(uuid, gameInfo);
-        logbooks.put(uuid, logbook);
+        games.put(uuid, new GameFiles(gameInfo, game, logbook));
     }
 
     private void saveGameInfo(GameInfo gameInfo) {
         File file = gameDirectory(gameInfo.uuid());
+
+        if (!file.exists()) {
+            file.mkdir();
+        }
 
         if (!file.isDirectory()) {
             Log.LOGGER.error("File {} exists and is not a directory, skipping save", file.getAbsolutePath());
             return;
         }
 
-        File gameFile = new File(file.getAbsolutePath(), STATE_FILE_NAME);
+        File gameFile = new File(file.getAbsolutePath(), INFO_FILE_NAME);
 
         Log.LOGGER.info("Saving game '{}' with UUID {} to {}", gameInfo.name(), gameInfo.uuid(), gameFile.getAbsolutePath());
 
@@ -127,27 +140,29 @@ public class Storage {
         }
     }
 
-    private void saveStateToHistory(GameInfo gameInfo) {
-        File historyDirectory = stateHistoryDirectory(gameInfo.uuid());
+    private void saveStateToHistory(UUID uuid) {
+        File historyDirectory = stateHistoryDirectory(uuid);
 
         File[] historyFiles = Objects.requireNonNull(historyDirectory.listFiles());
 
         File gameFileToSave = new File(historyDirectory, historyFiles.length + JSON_FILE_SUFFIX);
 
-        Log.LOGGER.info("Saving game '{}' with UUID {} to {}", gameInfo.name(), gameInfo.uuid(), gameFileToSave.getAbsolutePath());
+        Log.LOGGER.info("Saving {} to {}", uuid, gameFileToSave.getAbsolutePath());
 
-        if (!Util.writeStringToFile(gameFileToSave, gameInfo.game().getState().toJson().toString())) {
+        GameFiles files = games.get(uuid);
+
+        if (!Util.writeStringToFile(gameFileToSave, files.game.getState().toJson().toString())) {
             Log.LOGGER.error("Failed to write file {}", gameFileToSave.getAbsolutePath());
         }
     }
 
-    private void saveLogbook(GameInfo gameInfo) {
-        File logbookFile = logbookFile(gameInfo.uuid());
+    private void saveLogbook(UUID uuid) {
+        File logbookFile = logbookFile(uuid);
 
-        Log.LOGGER.info("Saving logbook for game '{}' with UUID {} to {}", gameInfo.name(), gameInfo.uuid(), logbookFile.getAbsolutePath());
+        Log.LOGGER.info("Saving logbook for game {} to {}", uuid, logbookFile.getAbsolutePath());
 
         JSONArray logbookJsonArray = new JSONArray();
-        for (LogEntry logEntry : logbooks.get(gameInfo.uuid())) {
+        for (LogEntry logEntry : games.get(uuid).logbook) {
             logbookJsonArray.put(logEntry.toJson());
         }
 
@@ -156,18 +171,32 @@ public class Storage {
         }
     }
 
-    public void saveGameAfterAction(GameInfo gameInfo, LogEntry logEntry) {
-        games.put(gameInfo.uuid(), gameInfo);
-        logbooks.get(gameInfo.uuid()).add(logEntry);
+    public void saveGameInitialState(GameInfo gameInfo, Game game) {
+        games.put(gameInfo.uuid(), new GameFiles(gameInfo, game, new ArrayList<>()));
 
-        File gameDirectory = gameDirectory(gameInfo.uuid());
+        UUID uuid = gameInfo.uuid();
+        File gameDirectory = gameDirectory(uuid);
         if (!gameDirectory.exists()) {
-            initializeGameDirectory(gameInfo.uuid());
+            initializeGameDirectory(uuid);
         }
 
-        saveStateToHistory(gameInfo);
-        saveLogbook(gameInfo);
+        saveStateToHistory(uuid);
+        saveLogbook(uuid);
         saveGameInfo(gameInfo);
+    }
+
+    public void saveGameAfterAction(UUID uuid, Game game, LogEntry logEntry) {
+        GameFiles files = games.get(uuid);
+        files.logbook.add(logEntry);
+        updateGame(uuid, game);
+
+        File gameDirectory = gameDirectory(uuid);
+        if (!gameDirectory.exists()) {
+            initializeGameDirectory(uuid);
+        }
+
+        saveStateToHistory(uuid);
+        saveLogbook(uuid);
     }
 
     private JSONObject readJsonFromFile(File file) {
@@ -211,15 +240,19 @@ public class Storage {
     }
 
     public List<GameInfo> getAllGames() {
-        return new ArrayList<>(games.values());
+        return games.values().stream().map((gameFiles) -> gameFiles.gameInfo).toList();
     }
 
     public GameInfo getGameInfoByUUID(UUID uuid) {
-        return games.get(uuid);
+        return games.get(uuid).gameInfo;
+    }
+
+    public Game getGameByUUID(UUID uuid) {
+        return games.get(uuid).game;
     }
 
     public List<LogEntry> getLogbookByUUID(UUID uuid) {
-        return logbooks.get(uuid);
+        return games.get(uuid).logbook;
     }
 
     public Optional<String> getRulesByUUID(UUID uuid) {
@@ -238,11 +271,12 @@ public class Storage {
     }
 
     public boolean undoAction(UUID uuid) {
-        GameInfo gameInfo = games.get(uuid);
-        List<LogEntry> logbook = logbooks.get(uuid);
+        GameInfo gameInfo = getGameInfoByUUID(uuid);
+        Game game = getGameByUUID(uuid);
+        List<LogEntry> logbook = getLogbookByUUID(uuid);
 
         // Fail if the game information or logbook cannot be found by the given ID
-        if (gameInfo == null || logbook == null) {
+        if (gameInfo == null || game == null || logbook == null) {
             Log.LOGGER.error("Attempted to remove most recent action from game '{}' with UUID {}", gameInfo == null ? "null" : gameInfo.name(), uuid);
             return false;
         }
@@ -274,12 +308,9 @@ public class Storage {
             return false;
         }
 
-        gameInfo.game().setState(newCurrentState);
-        games.put(uuid, gameInfo);
-        logbooks.put(uuid, logbook);
-
-        saveLogbook(gameInfo);
-        saveGameInfo(gameInfo);
+        game.setState(newCurrentState);
+        updateGame(uuid, game);
+        saveLogbook(uuid);
 
         Log.LOGGER.info("Successfully removed most recent action from game '{}' with UUID {}", gameInfo.name(), gameInfo.uuid());
         return true;

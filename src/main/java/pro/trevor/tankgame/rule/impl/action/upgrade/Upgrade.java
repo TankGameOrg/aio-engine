@@ -8,9 +8,18 @@ import pro.trevor.tankgame.state.State;
 import pro.trevor.tankgame.state.board.unit.Tank;
 import pro.trevor.tankgame.state.meta.PlayerRef;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 public class Upgrade implements Action {
+
+    private final List<Boon> availableBoons;
+
+    public Upgrade(List<Boon> availableBoons) {
+        this.availableBoons = new ArrayList<>(availableBoons);
+    }
+
     @Override
     public Error apply(State state, LogEntry entry) {
         Optional<PlayerRef> maybeSubject = entry.get(Attribute.SUBJECT);
@@ -34,6 +43,10 @@ public class Upgrade implements Action {
 
         if (tank.has(Attribute.BOON)) {
             return new Error(Error.Type.OTHER, "Subject tank already has an upgrade");
+        }
+
+        if (!availableBoons.contains(boon)) {
+            return new Error(Error.Type.OTHER, "Target boon does not exist");
         }
 
         tank.put(Attribute.SCRAP, tank.getUnsafe(Attribute.SCRAP) - 6);

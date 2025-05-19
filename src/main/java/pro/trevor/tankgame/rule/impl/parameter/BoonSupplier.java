@@ -8,11 +8,21 @@ import pro.trevor.tankgame.rule.impl.action.upgrade.Boon;
 import pro.trevor.tankgame.state.State;
 import pro.trevor.tankgame.state.meta.Player;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 public class BoonSupplier implements AvailableParameterSupplier<Boon> {
+
+    private final List<Boon> values;
+
+    public BoonSupplier(List<Boon> values) {
+        this.values = new ArrayList<>(values);
+    }
+
+
     @Override
     public ParameterBound<Boon> possibleParameters(State state, Player player) {
-        return new DiscreteValueBound<>(Attribute.TARGET_BOON, Arrays.asList(Boon.values()));
+        return new DiscreteValueBound<>(Attribute.TARGET_BOON, values);
     }
 }

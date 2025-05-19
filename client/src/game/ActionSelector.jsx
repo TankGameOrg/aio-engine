@@ -104,7 +104,7 @@ function ActionSelector({uuid, enabled, update, updateActiveGame, setPositionOpt
                             />
                             <span>
                                 <label title={action.description} className={`${action.error ? "label-strikethrough" : ""}`}>{`${action.name}`}</label>
-                                { action.error ? <span>{action.error}</span> : <></> }
+                                { action.error ? <span> {action.error}</span> : <></> }
                             </span>
                         </div>
                     )}

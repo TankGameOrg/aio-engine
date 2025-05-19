@@ -17,10 +17,16 @@ public class Repair implements Action {
 
     private final int cost;
     private final int regeneration;
+    private final int maxRepairDurability;
 
     public Repair(int cost, int regeneration) {
+        this(cost, regeneration, Integer.MAX_VALUE);
+    }
+
+    public Repair(int cost, int regeneration, int maxRepairDurability) {
         this.cost = cost;
         this.regeneration = regeneration;
+        this.maxRepairDurability = maxRepairDurability;
     }
 
     @Override
@@ -62,8 +68,12 @@ public class Repair implements Action {
         }
 
         tank.put(Attribute.SCRAP, tank.getUnsafe(Attribute.SCRAP) - cost);
-        entity.put(Attribute.DURABILITY, entity.getUnsafe(Attribute.DURABILITY) + regeneration);
+        entity.put(Attribute.DURABILITY, Math.min(maxRepairDurability, entity.getUnsafe(Attribute.DURABILITY) + regeneration));
 
         return Error.NONE;
+    }
+
+    public int getMaxRepairDurability() {
+        return maxRepairDurability;
     }
 }

@@ -2,37 +2,43 @@ package pro.trevor.tankgame.rule.impl.action.upgrade;
 
 import org.json.JSONObject;
 import pro.trevor.tankgame.attribute.Attribute;
-import pro.trevor.tankgame.attribute.AttributeEntity;
-import pro.trevor.tankgame.attribute.Codec;
-import pro.trevor.tankgame.util.IJsonObject;
+import pro.trevor.tankgame.rule.impl.action.specialize.AttributeModifier;
 import pro.trevor.tankgame.util.JsonType;
 
+import java.util.Objects;
+
 @JsonType(name = "Boon")
-public enum Boon implements IJsonObject {
-    Attack(Attribute.DAMAGE_MODIFIER, 1),
-    Defense(Attribute.DEFENSE_MODIFIER, 1),
-    Speed(Attribute.SPEED, 1),
-    Range(Attribute.RANGE, 1)
-    ;
+public class Boon extends AttributeModifier {
 
-    private final Attribute<Integer> attribute;
-    private final int modifier;
+    private final String name;
 
-    Boon(Attribute<Integer> attribute, int modifier) {
-        this.attribute = attribute;
-        this.modifier = modifier;
+    public Boon(String name, Attribute<Integer> attribute, int modifier) {
+        super(attribute, modifier);
+        this.name = name;
     }
 
-    public void apply(AttributeEntity entity) {
-        entity.put(attribute, entity.getOrElse(attribute, 0) + modifier);
-    }
-
-    public void remove(AttributeEntity entity) {
-        entity.put(attribute, entity.getOrElse(attribute, 0) - modifier);
+    public Boon(JSONObject json) {
+        super(json);
+        name = json.getString("name");
     }
 
     @Override
     public JSONObject toJson() {
-        return new JSONObject();
+        JSONObject json = super.toJson();
+        json.put("name", name);
+        return json;
+    }
+
+    @Override
+    public boolean equals(Object object) {
+        if (this == object) return true;
+        if (!(object instanceof Boon boon)) return false;
+        if (!super.equals(object)) return false;
+        return Objects.equals(name, boon.name);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), name);
     }
 }

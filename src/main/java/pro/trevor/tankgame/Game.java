@@ -17,18 +17,18 @@ import java.util.*;
 
 public class Game {
 
-    private final String rulesetIdentifier;
+    private final RulesetRegister rulesetRegister;
     private final Ruleset ruleset;
     private State state;
 
     public Game(RulesetRegister register) {
-        this.rulesetIdentifier = register.getIdentifier();
+        this.rulesetRegister = register;
         this.ruleset = new Ruleset(register);
         this.state = null;
     }
 
     public Game(RulesetRegister register, State state) {
-        this.rulesetIdentifier = register.getIdentifier();
+        this.rulesetRegister = register;
         this.ruleset = new Ruleset(register);
         this.state = state;
     }
@@ -41,8 +41,8 @@ public class Game {
         this.state = state;
     }
 
-    public String getRulesetIdentifier() {
-        return rulesetIdentifier;
+    public RulesetRegister getRulesetRegister() {
+        return rulesetRegister;
     }
 
     public JSONObject ingestEntry(LogEntry entry) {
@@ -116,26 +116,14 @@ public class Game {
 
     public List<LogEntry> tick() {
         List<LogEntry> entries = new ArrayList<>();
-        ruleset.getTickRuleset().stream().forEach((tickRule) -> {
-            tickRule.apply(state).map(entries::add);
-            enforceInvariants();
-        });
+        ruleset.getTickRuleset().stream().forEach((tickRule) -> tickRule.apply(state).map(entries::add));
         checkConditions();
         state.put(Attribute.TICK, state.getOrElse(Attribute.TICK, 0) + 1);
         return entries;
     }
 
     public void checkConditions() {
-        ruleset.getConditionalRuleset().stream().forEach((conditionRule) -> {
-            conditionRule.apply(state);
-            enforceInvariants();
-        });
-    }
-
-    public void enforceInvariants() {
-        ruleset.getInvariantRuleset().stream().forEach((invariantRule) -> {
-            invariantRule.apply(state);
-        });
+        ruleset.getConditionalRuleset().stream().forEach((conditionRule) -> conditionRule.apply(state));
     }
 
     public JSONObject possibleActions(PlayerRef subjectRef) {
@@ -167,7 +155,9 @@ public class Game {
             if (preconditionErrors.stream().anyMatch((error) -> error.type() == Error.Type.PRECONDITION)) {
                 continue;
             } else if (!preconditionErrors.isEmpty()) {
-                possibleAction.put("error", preconditionErrors.stream().map(Error::message).reduce("",  (left, right) -> left + "; " + right).substring(2));
+                possibleAction.put("error", preconditionErrors.stream()
+                        .map(Error::message)
+                        .reduce("",  (left, right) -> left + "; " + right).substring(2));
             } else {
                 JSONArray parametersArray = new JSONArray();
                 for (Parameter<?> parameter : rule.getParameters()) {
@@ -190,6 +180,7 @@ public class Game {
         if (maybePlayer.isEmpty()) {
             return jsonError("No player found for given subject: " + subjectRef);
         }
+        Player player = maybePlayer.get();
 
         if (maybeAction.isEmpty()) {
             return jsonError("No action rule found for given action: " + actionName);
@@ -197,12 +188,17 @@ public class Game {
 
         ActionRule rule = maybeAction.get().right();
 
+        List<Error> preconditionErrors = rule.getPredicate().test(state, player);
         Error error = rule.getPredicate().test(state, entry);
 
-        if (error == Error.NONE) {
+        if (error == Error.NONE && preconditionErrors.isEmpty()) {
             return jsonSuccess();
         } else {
-            return jsonError(error.message());
+            return jsonError(error.message() + (preconditionErrors.isEmpty() ?
+                    "" :
+                    ("; " + preconditionErrors.stream()
+                            .map(Error::message)
+                            .reduce("",  (left, right) -> left + "; " + right).substring(2))));
         }
     }
 

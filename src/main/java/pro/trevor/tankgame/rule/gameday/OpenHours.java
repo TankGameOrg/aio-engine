@@ -50,6 +50,10 @@ public class OpenHours implements IJsonObject {
             }
         }
 
+        if (openHours.isEmpty()) {
+            return true;
+        }
+
         for (DaySpec daySpec : openHours) {
             if (daySpec.isOpen(calendar)) {
                 return true;

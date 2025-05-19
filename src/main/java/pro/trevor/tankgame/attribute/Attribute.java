@@ -11,6 +11,7 @@ import pro.trevor.tankgame.util.IRandom;
 
 import java.util.HashSet;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 
 public class Attribute<E> {
@@ -66,6 +67,7 @@ public class Attribute<E> {
     public static final Attribute<Boolean> HAS_COMPELLED_FALLEN = new Attribute<>("HAS_COMPELLED_FALLEN", Boolean.class);
 
     // Log entry attributes
+    public static final Attribute<Boolean> SUCCESS = new Attribute<>("SUCCESS", Boolean.class);
     public static final Attribute<ListEntity> SUBENTRIES = new Attribute<>("SUBENTRIES", ListEntity.class); // ListEntity<LogEntry>
     public static final Attribute<String> ACTION = new Attribute<>("ACTION", String.class);
     public static final Attribute<PlayerRef> SUBJECT = new Attribute<>("SUBJECT", PlayerRef.class);
@@ -100,6 +102,17 @@ public class Attribute<E> {
 
     public Class<E> getAttributeClass() {
         return attributeClass;
+    }
+
+    public static Optional<Attribute<?>> fromString(String attributeString) {
+        return ATTRIBUTES.stream().filter((attr) -> attr.attributeName.equals(attributeString)).findAny();
+    }
+
+    public static <T> Optional<Attribute<T>> fromString(String attributeString, Class<T> type) {
+        return ATTRIBUTES.stream()
+                .filter((attr) -> attr.attributeName.equals(attributeString) && attr.attributeClass.isAssignableFrom(type))
+                .map((attr) -> (Attribute<T>) attr)
+                .findAny();
     }
 
     @Override

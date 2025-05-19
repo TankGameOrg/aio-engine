@@ -1,7 +1,7 @@
 import {useParams} from "react-router-dom";
 import {fetchGame, fetchRules, fetchState, postTick, postUndoAction} from "../util/fetch.js";
 import {SERVER_URL} from "../util/constants.js";
-import {useCallback, useEffect, useRef, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import Board from "./board/Board.jsx";
 import promptMatches from "../util/prompt.js";
 import Logbook from "./Logbook.jsx";
@@ -10,6 +10,7 @@ import Menu from "./Menu.jsx";
 import useOpenHours, {daySpecToString} from "./UseOpenHours.js";
 import Markdown from "marked-react";
 import "./Game.css";
+import logbook from "./Logbook.jsx";
 
 function Game() {
     const uuid = useParams().uuid;
@@ -45,10 +46,10 @@ function Game() {
     const selectPlayerForActionFunction = useRef(() => {});
     const clearActionSelectorFunction = useRef(() => {});
     const scrollToActiveGameFunction = useRef(() => {});
+    const timeoutNumber = useRef(0);
 
     useEffect(() => {
-        scrollToActiveGameFunction.current(game.logbook.length - 1)
-        // setTimeout(() => , 100);
+        scrollToActiveGameFunction.current(game.logbook.length - 1);
     }, [game]);
 
     const updateActiveGame = useCallback((newGame) => {
@@ -60,22 +61,25 @@ function Game() {
 
     const updateLogbook = useCallback(() => {
         return fetchGame(SERVER_URL, uuid).then(res => res.json()).then(data => {
-            setGame({...game, logbook: data.logbook, name: data.name});
-            updateActiveGame(data.logbook.length);
             loading.current = false;
+            if (data.logbook.length !== game.logbook.length) {
+                setGame({...data.game, logbook: data.logbook, name: data.name});
+                updateActiveGame(data.logbook.length);
+            }
         });
     }, [game, updateActiveGame]);
 
-    function updateLogbookForever() {
-        updateLogbook().then(() => {
-            setTimeout(updateLogbookForever, 2000);
-        })
-    }
+    const updateLogbookForever = useCallback(() => {
+        return updateLogbook().then(() => {
+            timeoutNumber.current = setTimeout(updateLogbookForever, 2000);
+        });
+    }, [updateLogbook]);
 
     useEffect(() => {
         updateLogbookForever();
         fetchRules(SERVER_URL, uuid).then(res => res.json()).then(data => setRules(<Markdown value={data?.rules} />));
-    }, []);
+        return () => clearTimeout(timeoutNumber.current);
+    }, [updateLogbookForever]);
 
     useEffect(() => {
         fetchState(SERVER_URL, uuid, activeGame).then(res => res.json()).then(data => {

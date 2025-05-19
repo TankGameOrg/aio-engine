@@ -13,12 +13,15 @@ import pro.trevor.tankgame.util.Random;
 public class DamageDurabilityHandle implements DamageHandle {
 
     private final int[] distribution;
+    private final int minimumDamage;
 
-    public DamageDurabilityHandle() {
-        this.distribution = new int[]{1};
+    public DamageDurabilityHandle(int minimumDamage) {
+        this(minimumDamage, new int[]{1});
     }
 
-    public DamageDurabilityHandle(int[] distribution) {
+    public DamageDurabilityHandle(int minimumDamage, int[] distribution) {
+        assert minimumDamage >= 0;
+        this.minimumDamage = minimumDamage;
         this.distribution = distribution;
     }
 
@@ -41,8 +44,8 @@ public class DamageDurabilityHandle implements DamageHandle {
         int totalDamage = damage + attackModifier - defenseModifier;
 
         // If we might apply negative damage, set the damage to zero
-        if (totalDamage < 0) {
-            totalDamage = 0;
+        if (totalDamage < minimumDamage) {
+            totalDamage = minimumDamage;
         }
 
         entry.put(Attribute.DICE_ROLL, damage);
